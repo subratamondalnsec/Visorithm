@@ -13,7 +13,7 @@
 
 ## 📋 Quick Links
 
-- [Live Demo](https://visorithm.example.com/)
+- [Live Demo](https://visorithm.vercel.app/)
 - [Features](#features)
 - [How to Use](#how-to-use)
 - [Technical Details](#technical-details)

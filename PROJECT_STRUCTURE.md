@@ -343,7 +343,7 @@ These paths are not present in the current `public/` tree and must be supplied o
 ### Sitemap references
 
 - `index.html` links to `/manifest.json`.
-- `public/robots.txt` points to `https://visorithm.example.com/sitemap.xml`.
+- `public/robots.txt` points to `https://visorithm.vercel.app/sitemap.xml`.
 - `public/sitemap.xml` lists the application routes under the temporary Visorithm domain.
 
 ## SEO Files
@@ -363,7 +363,7 @@ TODO:
 
 Purpose: Allows crawlers and advertises the XML sitemap location.
 
-Current value: all crawlers are allowed and the sitemap uses `https://visorithm.example.com/sitemap.xml`.
+Current value: all crawlers are allowed and the sitemap uses `https://visorithm.vercel.app/sitemap.xml`.
 
 TODO:
 - Replace `visorithm.example.com` with the final production domain.

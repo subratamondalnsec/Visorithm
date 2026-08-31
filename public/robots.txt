@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 
 # TODO: Replace this placeholder with Visorithm's production domain.
-Sitemap: https://visorithm.example.com/sitemap.xml
+Sitemap: https://visorithm.vercel.app/sitemap.xml

@@ -2,91 +2,91 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
    <!-- TODO: Replace visorithm.example.com with the production domain before deployment. -->
    <url>
-      <loc>https://visorithm.example.com/</loc>
+      <loc>https://visorithm.vercel.app/</loc>
       <lastmod>2024-05-18</lastmod>
       <changefreq>monthly</changefreq>
       <priority>1.0</priority>
    </url>
    <url>
-      <loc>https://visorithm.example.com/sorting/bubble</loc>
+      <loc>https://visorithm.vercel.app/sorting/bubble</loc>
       <lastmod>2024-05-18</lastmod>
       <changefreq>monthly</changefreq>
       <priority>0.8</priority>
    </url>
    <url>
-      <loc>https://visorithm.example.com/sorting/merge</loc>
+      <loc>https://visorithm.vercel.app/sorting/merge</loc>
       <lastmod>2024-05-18</lastmod>
       <changefreq>monthly</changefreq>
       <priority>0.8</priority>
    </url>
    <url>
-      <loc>https://visorithm.example.com/sorting/quick</loc>
+      <loc>https://visorithm.vercel.app/sorting/quick</loc>
       <lastmod>2024-05-18</lastmod>
       <changefreq>monthly</changefreq>
       <priority>0.8</priority>
    </url>
    <url>
-      <loc>https://visorithm.example.com/searching/binary</loc>
+      <loc>https://visorithm.vercel.app/searching/binary</loc>
       <lastmod>2024-05-18</lastmod>
       <changefreq>monthly</changefreq>
       <priority>0.8</priority>
    </url>
    <url>
-      <loc>https://visorithm.example.com/searching/linear</loc>
+      <loc>https://visorithm.vercel.app/searching/linear</loc>
       <lastmod>2024-05-18</lastmod>
       <changefreq>monthly</changefreq>
       <priority>0.7</priority>
    </url>
    <url>
-      <loc>https://visorithm.example.com/graph/bfs</loc>
+      <loc>https://visorithm.vercel.app/graph/bfs</loc>
       <lastmod>2024-05-18</lastmod>
       <changefreq>monthly</changefreq>
       <priority>0.8</priority>
    </url>
    <url>
-      <loc>https://visorithm.example.com/graph/dfs</loc>
+      <loc>https://visorithm.vercel.app/graph/dfs</loc>
       <lastmod>2024-05-18</lastmod>
       <changefreq>monthly</changefreq>
       <priority>0.8</priority>
    </url>
    <url>
-      <loc>https://visorithm.example.com/dynamic-programming/fibonacci</loc>
+      <loc>https://visorithm.vercel.app/dynamic-programming/fibonacci</loc>
       <lastmod>2024-05-18</lastmod>
       <changefreq>monthly</changefreq>
       <priority>0.8</priority>
    </url>
    <url>
-      <loc>https://visorithm.example.com/greedy-algorithm/activity-selection</loc>
+      <loc>https://visorithm.vercel.app/greedy-algorithm/activity-selection</loc>
       <lastmod>2024-05-18</lastmod>
       <changefreq>monthly</changefreq>
       <priority>0.7</priority>
    </url>
    <url>
-      <loc>https://visorithm.example.com/backtracking/n-queens</loc>
+      <loc>https://visorithm.vercel.app/backtracking/n-queens</loc>
       <lastmod>2024-05-18</lastmod>
       <changefreq>monthly</changefreq>
       <priority>0.7</priority>
    </url>
    <url>
-      <loc>https://visorithm.example.com/tree-algorithms/binary-search-tree</loc>
+      <loc>https://visorithm.vercel.app/tree-algorithms/binary-search-tree</loc>
       <lastmod>2024-05-18</lastmod>
       <changefreq>monthly</changefreq>
       <priority>0.7</priority>
    </url>
    <url>
-      <loc>https://visorithm.example.com/mathematical-algorithms/gcd-euclidean</loc>
+      <loc>https://visorithm.vercel.app/mathematical-algorithms/gcd-euclidean</loc>
       <lastmod>2024-05-18</lastmod>
       <changefreq>monthly</changefreq>
       <priority>0.7</priority>
    </url>
    <url>
-      <loc>https://visorithm.example.com/race-mode</loc>
+      <loc>https://visorithm.vercel.app/race-mode</loc>
       <lastmod>2024-05-18</lastmod>
       <changefreq>monthly</changefreq>
       <priority>0.9</priority>
    </url>
    <url>
-      <loc>https://visorithm.example.com/faq</loc>
+      <loc>https://visorithm.vercel.app/faq</loc>
       <lastmod>2024-05-18</lastmod>
       <changefreq>monthly</changefreq>
       <priority>0.6</priority>
