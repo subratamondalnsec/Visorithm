@@ -109,7 +109,7 @@ const Navbar = () => {
       className="fixed inset-x-0 top-0 z-50 border-b border-sky-400/15 bg-slate-950/95 shadow-[0_10px_32px_rgba(2,6,23,0.24)] backdrop-blur-xl"
       aria-label="Primary navigation"
     >
-      <div className="mx-auto grid h-16 w-full max-w-7xl grid-cols-[auto_1fr_auto] items-center gap-3 px-4 sm:px-6 min-[1180px]:h-[72px] min-[1180px]:gap-6 min-[1180px]:px-8">
+      <div className="mx-auto grid h-16 w-full max-w-7xl grid-cols-[auto_1fr_auto] items-center gap-2 px-3 min-[600px]:gap-3 min-[600px]:px-4 min-[1024px]:h-[72px] min-[1024px]:gap-6 min-[1024px]:px-8">
         <Link
           to="/"
           className="flex shrink-0 items-center gap-1.5 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300"
@@ -118,24 +118,24 @@ const Navbar = () => {
           <span className="bg-gradient-to-r from-sky-400 to-blue-600 bg-clip-text text-lg font-semibold tracking-tight text-transparent">Visorithm</span>
         </Link>
 
-        <div className="hidden min-w-0 items-center justify-center gap-2 min-[1180px]:flex min-[1280px]:gap-3">
+        <div className="hidden min-w-0 items-center justify-center gap-1.5 min-[600px]:flex min-[700px]:gap-2 min-[1024px]:gap-3">
           <Link
             to="/sorting/bubble-sort"
-            className={desktopLinkClass("/sorting/bubble-sort")}
+            className={`${desktopLinkClass("/sorting/bubble-sort")} px-2 text-xs min-[1024px]:px-3 min-[1024px]:text-sm`}
           >
             Visualizer
           </Link>
 
-          <div className="relative w-52 min-[1280px]:w-60 min-[1440px]:w-64">
+          <div className="relative w-32 min-[700px]:w-36 min-[850px]:w-44 min-[1024px]:w-52 min-[1280px]:w-60 min-[1440px]:w-64">
             <input
               type="search"
               value={searchQuery}
               onChange={handleSearch}
               placeholder="Search algorithms..."
               aria-label="Search algorithms"
-              className="h-10 w-full rounded-lg border border-sky-400/15 bg-slate-900/90 py-2 pl-9 pr-3 text-sm text-slate-100 placeholder:text-slate-500 shadow-inner shadow-slate-950/30 outline-none transition-all duration-200 focus:border-sky-400/45 focus:ring-2 focus:ring-sky-400/20"
+              className="h-9 w-full rounded-lg border border-sky-400/15 bg-slate-900/90 py-2 pl-8 pr-2 text-xs text-slate-100 placeholder:text-slate-500 shadow-inner shadow-slate-950/30 outline-none transition-all duration-200 focus:border-sky-400/45 focus:ring-2 focus:ring-sky-400/20 min-[1024px]:h-10 min-[1024px]:pl-9 min-[1024px]:pr-3 min-[1024px]:text-sm"
             />
-            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">
+            <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500 min-[1024px]:left-3">
               <SearchIcon />
             </span>
             {searchQuery && (
@@ -175,20 +175,20 @@ const Navbar = () => {
               aria-controls="explore-algorithms-menu"
               onClick={() => setIsExploreOpen((open) => !open)}
               onFocus={() => setIsExploreOpen(true)}
-              className={`flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 ${
+              className={`flex items-center gap-1 rounded-lg px-2 py-2 text-xs font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 min-[1024px]:px-3 min-[1024px]:text-sm ${
                 isExploreOpen
                   ? "border border-sky-400/20 bg-sky-400/10 text-sky-100"
                   : "border border-transparent text-slate-300 hover:bg-slate-800/80 hover:text-slate-100"
               }`}
             >
-              Explore Algorithms <Chevron open={isExploreOpen} />
+              <span>Explore <span className="hidden min-[1024px]:inline">Algorithms</span></span> <Chevron open={isExploreOpen} />
             </button>
 
             <div
               id="explore-algorithms-menu"
               role="menu"
               aria-label="Explore algorithms"
-              className={`absolute left-1/2 top-full mt-3 w-[min(1000px,calc(100vw-3rem))] -translate-x-1/2 origin-top rounded-2xl border border-sky-300/15 bg-slate-900/98 p-4 shadow-2xl shadow-slate-950/60 transition-all duration-200 ${
+              className={`absolute left-1/2 top-full mt-3 max-h-[calc(100vh-6rem)] w-[min(1000px,calc(100vw-3rem))] -translate-x-1/2 overflow-y-auto origin-top rounded-2xl border border-sky-300/15 bg-slate-900/98 p-4 shadow-2xl shadow-slate-950/60 transition-all duration-200 max-[1023px]:fixed max-[1023px]:top-[72px] max-[1023px]:mt-0 max-[1023px]:w-[calc(100vw-2rem)] ${
                 isExploreOpen
                   ? "visible translate-y-0 opacity-100"
                   : "invisible -translate-y-1 opacity-0"
@@ -203,7 +203,7 @@ const Navbar = () => {
                   </div>
                 </div>
               </div>
-              <div className="grid grid-cols-4 gap-3">
+              <div className="grid grid-cols-2 gap-3 min-[1024px]:grid-cols-4">
                 {Object.entries(algorithmCategories).map(([category, algorithms]) => (
                   <section key={category} aria-label={category} className="min-w-0 rounded-lg border border-slate-800/80 bg-slate-950/35 p-2.5">
                     <h2 className="mb-1.5 truncate border-b border-slate-800 pb-1.5 text-[11px] font-bold uppercase leading-tight tracking-[0.12em] text-sky-300" title={category}>
@@ -230,17 +230,17 @@ const Navbar = () => {
             </div>
           </div>
 
-          <Link to="/race-mode" className={navLinkClass("/race-mode")}>
+          <Link to="/race-mode" className={`${navLinkClass("/race-mode")} hidden min-[1024px]:block`}>
             Open Race Mode
           </Link>
         </div>
 
-        <div className="hidden shrink-0 items-center min-[1180px]:flex">
+        <div className="hidden shrink-0 items-center min-[600px]:flex">
           <StudentIllustration />
         </div>
         <button
           type="button"
-          className="justify-self-end rounded-lg p-2 text-slate-200 transition-colors hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 min-[1180px]:hidden"
+          className="justify-self-end rounded-lg p-2 text-slate-200 transition-colors hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 min-[600px]:hidden"
           aria-label={isMobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
           aria-expanded={isMobileMenuOpen}
           onClick={() => setIsMobileMenuOpen((open) => !open)}
@@ -250,7 +250,7 @@ const Navbar = () => {
       </div>
 
       {isMobileMenuOpen && (
-        <div className="border-t border-slate-800 bg-slate-950 px-4 py-3 shadow-2xl min-[1180px]:hidden">
+        <div className="border-t border-slate-800 bg-slate-950 px-4 py-3 shadow-2xl min-[600px]:hidden">
           <div className="mx-auto max-w-7xl space-y-1">
             <Link onClick={() => setIsMobileMenuOpen(false)} to="/sorting/bubble-sort" className="block rounded-lg border border-sky-400/15 bg-sky-400/10 px-3 py-3 text-sm font-semibold text-sky-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300">
               Visualizer
