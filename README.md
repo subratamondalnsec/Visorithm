@@ -27,6 +27,36 @@ Visorithm is a dynamic, interactive platform for comparing algorithm performance
 
 ## ✨ Key Features
 
+## Hero CTA Polish
+
+### Added
+
+- Premium hero CTA styling with the existing logo asset and bounded race-mode icon animation.
+
+### Changed
+
+- Hero `Explore Algorithms` now uses a warm amber/gold gradient with depth, highlight, focus, hover, and active states.
+- Hero `Open Race Mode` now uses a violet/indigo gradient with a spring-animated arrow that stays clear of the label.
+- Hero CTAs stack on small screens and remain side-by-side from the `sm` breakpoint upward.
+
+### Removed
+
+Nothing removed.
+
+### Reused
+
+- Existing `/images/logo.svg` asset.
+- Existing `motion` and `lucide-react` dependencies.
+- Existing `#explore` anchor and `/race-mode` route.
+
+### Dependencies
+
+None added.
+
+### Important Scope
+
+Navbar was not modified. These changes apply only to the two CTA buttons in the Hero Section.
+
 ### 🏁 Algorithm Racing
 
 - Real-time algorithm comparison

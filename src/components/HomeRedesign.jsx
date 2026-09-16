@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { ArrowUpRight } from "lucide-react";
 import { AnimatedBars } from "./ui/animated-bars";
 import { TextFrame } from "./ui/text-frame";
 import TextHoverEffect from "./home/TextHoverEffect";
 import Seo from "./Seo";
+import { Logo } from "@/components/ui/icons/logo";
 
 const icons = {
   Sorting: "↕",
@@ -14,6 +16,7 @@ const icons = {
   Greedy: "◈",
   Searching: "⌕",
 };
+
 const categories = [
   {
     name: "Sorting",
@@ -211,6 +214,7 @@ const categories = [
 
 function CategoryCard({ category, open, onToggle }) {
   const reduceMotion = useReducedMotion();
+
   return (
     <motion.article
       layout
@@ -233,21 +237,27 @@ function CategoryCard({ category, open, onToggle }) {
         >
           {icons[category.name]}
         </span>
+
         <span className="min-w-0 flex-1">
           <span className="block text-base font-semibold tracking-tight text-slate-100">
             {category.name} Algorithms
           </span>
+
           <span className="mt-1 block text-sm text-slate-400">
             {category.items.length} algorithms available
           </span>
         </span>
+
         <span
-          className={`grid h-8 w-8 place-items-center rounded-full border border-slate-700 text-blue-300 transition-transform duration-300 ${open ? "rotate-180 bg-blue-500/10" : ""}`}
+          className={`grid h-8 w-8 place-items-center rounded-full border border-slate-700 text-blue-300 transition-transform duration-300 ${
+            open ? "rotate-180 bg-blue-500/10" : ""
+          }`}
           aria-hidden="true"
         >
           ⌄
         </span>
       </button>
+
       <AnimatePresence initial={false}>
         {open && (
           <motion.div
@@ -255,7 +265,10 @@ function CategoryCard({ category, open, onToggle }) {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: reduceMotion ? 0 : 0.25, ease: "easeOut" }}
+            transition={{
+              duration: reduceMotion ? 0 : 0.25,
+              ease: "easeOut",
+            }}
           >
             <div className="border-t border-slate-700/70 px-5 pb-5 pt-3 sm:px-6 sm:pb-6">
               {category.items.map(([id, title, difficulty, note]) => (
@@ -268,12 +281,18 @@ function CategoryCard({ category, open, onToggle }) {
                     <span className="font-medium text-slate-200 group-hover/item:text-blue-300">
                       {title}
                     </span>
+
                     <span
-                      className={`rounded-full border px-2 py-0.5 text-xs ${difficulty === "Easy" ? "border-blue-400/25 bg-blue-400/10 text-blue-300" : "border-slate-600 bg-slate-800 text-slate-400"}`}
+                      className={`rounded-full border px-2 py-0.5 text-xs ${
+                        difficulty === "Easy"
+                          ? "border-blue-400/25 bg-blue-400/10 text-blue-300"
+                          : "border-slate-600 bg-slate-800 text-slate-400"
+                      }`}
                     >
                       {difficulty}
                     </span>
                   </span>
+
                   <span className="mt-1 block text-sm leading-5 text-slate-400">
                     {note}
                   </span>
@@ -289,6 +308,18 @@ function CategoryCard({ category, open, onToggle }) {
 
 const HomeRedesign = () => {
   const [openCategory, setOpenCategory] = useState("Sorting");
+  const [isRaceHovered, setIsRaceHovered] = useState(false);
+  const [travelDistance, setTravelDistance] = useState(0);
+  const reduceMotion = useReducedMotion();
+
+  const raceBtnRef = useCallback((node) => {
+    if (!node) return;
+    const measure = () => setTravelDistance(node.clientWidth - 40 - 8);
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(node);
+  }, []);
+
   return (
     <div className="min-h-screen overflow-hidden bg-[#0F172B] text-slate-100">
       <Seo
@@ -296,6 +327,7 @@ const HomeRedesign = () => {
         description="Visualize algorithms, understand core concepts, and master DSA through focused interactive learning."
         keywords="algorithm visualization, DSA, sorting, graph algorithms, dynamic programming"
       />
+
       <AnimatedBars
         numBars={40}
         gradientFrom="rgb(59, 130, 246)"
@@ -308,6 +340,7 @@ const HomeRedesign = () => {
           <TextHoverEffect className="max-w-4xl text-5xl font-semibold tracking-[-0.055em] text-slate-100 sm:text-7xl">
             Visorithm
           </TextHoverEffect>
+
           <p className="mt-7 max-w-2xl text-xl font-medium leading-relaxed text-slate-400 sm:text-2xl">
             Visualize algorithms. Understand concepts.{" "}
             <TextFrame className="mx-1 text-sky-400 [&_svg]:text-sky-400 tracking-normal selection:bg-blue-900 selection:text-cyan-50">
@@ -316,27 +349,107 @@ const HomeRedesign = () => {
               </span>
             </TextFrame>
           </p>
+
           <p className="mt-5 max-w-xl text-base leading-7 text-slate-500">
             Explore each step, connect theory to motion, and develop the
             intuition that makes problem solving stick.
           </p>
-          <div className="mt-9 flex flex-col items-center gap-3 sm:flex-row">
+
+          {/* CTA group */}
+          <div className="mt-9 flex w-full flex-col items-center gap-3 sm:w-auto sm:flex-row">
+            {/* Explore Algorithms */}
             <a
               href="#explore"
-              className="rounded-lg bg-blue-500 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-950/40 transition-colors hover:bg-blue-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
+              className="group relative inline-flex h-12 w-full select-none items-center justify-center gap-2 overflow-hidden rounded-xl border border-white/90 bg-gradient-to-br from-sky-400 via-blue-500 to-blue-700 px-6 text-sm font-semibold text-white shadow-[0_8px_24px_rgba(14,165,233,0.22),0_4px_0_rgba(29,78,216,0.42),inset_0_1px_0_rgba(255,255,255,0.5)] transition-all duration-300 ease-out hover:brightness-[1.06] hover:shadow-[0_12px_30px_rgba(14,165,233,0.3),0_5px_0_rgba(29,78,216,0.46),inset_0_1px_0_rgba(255,255,255,0.55)] active:translate-y-[1px] focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80 sm:w-auto"
             >
-              Explore algorithms
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-x-1 top-0 h-1/2 rounded-t-[inherit] bg-gradient-to-b from-white/25 to-transparent opacity-90"
+              />
+
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute -left-20 top-0 h-full w-16 -skew-x-12 bg-white/15 blur-md transition-transform duration-700 ease-out group-hover:translate-x-[340px]"
+              />
+
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 rounded-[inherit] ring-1 ring-inset ring-white/85 transition-all duration-300 group-hover:ring-white"
+              />
+
+              <span className="relative z-10 flex items-center gap-1.5">
+                {/* Visorithm Logo — rendered as black */}
+                <Logo
+                  className="h-6 w-auto shrink-0 object-contain brightness-0 drop-shadow-[0_1px_1px_rgba(0,0,0,0.35)] transition-transform duration-200 group-hover:scale-105"
+                  aria-hidden="true"
+                />
+
+                <span className="font-semibold text-white">Explore Algorithms</span>
+              </span>
             </a>
+
+            {/* Open Race Mode */}
             <Link
+              ref={raceBtnRef}
               to="/race-mode"
-              className="rounded-lg border border-slate-600 bg-[#111827]/75 px-5 py-3 text-sm font-semibold text-slate-200 transition-colors hover:border-blue-400/60 hover:text-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
+              onMouseEnter={() => setIsRaceHovered(true)}
+              onMouseLeave={() => setIsRaceHovered(false)}
+              className="group relative inline-flex h-12 w-full min-w-0 select-none items-center justify-center overflow-hidden rounded-xl border border-white/15 bg-[#050816]/95 ps-6 pe-14 text-sm font-semibold text-slate-200 shadow-[0_7px_22px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-md transition-all duration-500 ease-out hover:border-white/25 hover:bg-[#02040d] hover:ps-14 hover:pe-6 hover:text-white hover:shadow-[0_10px_28px_rgba(0,0,0,0.5),0_0_20px_rgba(56,189,248,0.1),inset_0_1px_0_rgba(255,255,255,0.1)] active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/80 sm:w-auto sm:min-w-[190px]"
             >
-              Open race mode <span aria-hidden="true">→</span>
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 bg-gradient-to-r from-white/[0.02] via-white/[0.06] to-white/[0.02] opacity-60 transition-opacity duration-300 group-hover:opacity-100"
+              />
+
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 rounded-[inherit] ring-1 ring-inset ring-sky-400/10 transition-all duration-300 group-hover:ring-sky-300/20"
+              />
+
+              <span className="relative z-10 whitespace-nowrap text-slate-200 transition-all duration-500 group-hover:text-white">
+                Open Race Mode
+              </span>
+
+              <motion.div
+                aria-hidden="true"
+                className="absolute right-1 z-20 flex h-10 w-10 items-center justify-center rounded-lg border border-white/15 bg-slate-900/90 text-slate-100 shadow-[0_4px_12px_rgba(0,0,0,0.45)]"
+                animate={{
+                  x: reduceMotion ? 0 : isRaceHovered ? -travelDistance : 0,
+                  rotate: reduceMotion ? 0 : isRaceHovered ? 360 : 0,
+                }}
+                transition={{
+                  type: "spring",
+                  stiffness: 300,
+                  damping: 28,
+                }}
+              >
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute left-1/2 top-0 z-20 h-2/5 w-[80%] -translate-x-1/2 rounded-t-[inherit] bg-gradient-to-b from-white/40 via-white/10 to-transparent blur-[0.5px]"
+                />
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-0 z-0 rounded-[inherit] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.15),inset_0_1.5px_0_rgba(255,255,255,0.2),inset_0_-2px_4px_rgba(0,0,0,0.4)]"
+                />
+                <motion.span
+                  className="relative z-30 flex items-center justify-center drop-shadow-sm"
+                  animate={{ rotate: reduceMotion ? 0 : isRaceHovered ? 45 : 0 }}
+                  transition={{
+                    type: "spring",
+                    stiffness: 400,
+                    damping: 20,
+                  }}
+                >
+                  <ArrowUpRight size={16} strokeWidth={2.2} />
+                </motion.span>
+              </motion.div>
             </Link>
           </div>
+
           {/* TODO: Add Visorithm Hero Illustration */}
         </div>
       </AnimatedBars>
+
       <main
         id="explore"
         className="mx-auto max-w-6xl px-6 py-20 sm:px-8 sm:py-28"
@@ -345,14 +458,17 @@ const HomeRedesign = () => {
           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blue-300">
             Explore the toolkit
           </p>
+
           <h2 className="mt-3 text-3xl font-semibold tracking-tight text-slate-100 sm:text-4xl">
             Learn by following every decision.
           </h2>
+
           <p className="mt-4 leading-7 text-slate-400">
             Choose a family to view its visualizers, difficulty, and the idea
             behind each algorithm.
           </p>
         </div>
+
         <div className="mt-10 grid items-start gap-5 md:grid-cols-2">
           {categories.map((category) => (
             <CategoryCard
@@ -361,34 +477,41 @@ const HomeRedesign = () => {
               open={openCategory === category.name}
               onToggle={() =>
                 setOpenCategory(
-                  openCategory === category.name ? null : category.name,
+                  openCategory === category.name ? null : category.name
                 )
               }
             />
           ))}
         </div>
       </main>
+
       <footer className="border-t border-slate-800 bg-[#111827]">
         <div className="mx-auto flex max-w-6xl flex-col gap-8 px-6 py-10 sm:px-8 md:flex-row md:items-end md:justify-between">
           <div>
             <span className="text-lg font-semibold tracking-tight text-white">
               Visorithm
             </span>
+
             <p className="mt-2 max-w-sm text-sm leading-6 text-slate-400">
               A focused place to see algorithms work, one decision at a time.
             </p>
           </div>
+
           <div className="flex flex-wrap gap-x-6 gap-y-3 text-sm text-slate-400">
             {/* TODO: Add GitHub Link */}
             <span>GitHub</span>
+
             {/* TODO: Add LinkedIn Link */}
             <span>LinkedIn</span>
+
             {/* TODO: Add Portfolio Link */}
             <span>Documentation</span>
           </div>
         </div>
+
         <div className="mx-auto max-w-6xl border-t border-slate-800 px-6 py-5 text-xs text-slate-500 sm:px-8">
-          © {new Date().getFullYear()} Visorithm. Built for deliberate practice.
+          © {new Date().getFullYear()} Visorithm. Built for deliberate
+          practice.
         </div>
       </footer>
     </div>
