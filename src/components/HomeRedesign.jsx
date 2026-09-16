@@ -394,25 +394,32 @@ const HomeRedesign = () => {
               to="/race-mode"
               onMouseEnter={() => setIsRaceHovered(true)}
               onMouseLeave={() => setIsRaceHovered(false)}
-              className="group relative inline-flex h-12 w-full min-w-0 select-none items-center justify-center overflow-hidden rounded-xl border border-white/15 bg-[#050816]/95 ps-6 pe-14 text-sm font-semibold text-slate-200 shadow-[0_7px_22px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-md transition-all duration-500 ease-out hover:border-white/25 hover:bg-[#02040d] hover:ps-14 hover:pe-6 hover:text-white hover:shadow-[0_10px_28px_rgba(0,0,0,0.5),0_0_20px_rgba(56,189,248,0.1),inset_0_1px_0_rgba(255,255,255,0.1)] active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/80 sm:w-auto sm:min-w-[190px]"
+              className="group relative inline-flex h-12 w-full min-w-0 select-none items-center justify-center overflow-hidden rounded-xl border border-white/20 bg-[#161822]/95 ps-6 pe-14 text-sm font-semibold text-slate-100 shadow-[0_8px_24px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.18)] ring-1 ring-inset ring-white/15 backdrop-blur-md transition-all duration-500 ease-out hover:border-white/35 hover:bg-[#11131a] hover:ps-14 hover:pe-6 hover:text-white hover:ring-white/25 hover:shadow-[0_12px_30px_rgba(0,0,0,0.65),inset_0_1px_0_rgba(255,255,255,0.25)] active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80 sm:w-auto sm:min-w-[190px]"
             >
+              {/* Soft inner sheen */}
               <span
                 aria-hidden="true"
-                className="pointer-events-none absolute inset-0 bg-gradient-to-r from-white/[0.02] via-white/[0.06] to-white/[0.02] opacity-60 transition-opacity duration-300 group-hover:opacity-100"
+                className="pointer-events-none absolute inset-0 bg-gradient-to-r from-white/[0.03] via-white/[0.08] to-white/[0.03] opacity-70 transition-opacity duration-300 group-hover:opacity-100"
               />
 
+              {/* Subtle white contour ring */}
               <span
                 aria-hidden="true"
-                className="pointer-events-none absolute inset-0 rounded-[inherit] ring-1 ring-inset ring-sky-400/10 transition-all duration-300 group-hover:ring-sky-300/20"
+                className="pointer-events-none absolute inset-0 rounded-[inherit] ring-1 ring-inset ring-white/15 transition-all duration-300 group-hover:ring-white/30"
               />
 
-              <span className="relative z-10 whitespace-nowrap text-slate-200 transition-all duration-500 group-hover:text-white">
+              <span className="relative z-10 whitespace-nowrap text-slate-100 transition-all duration-500 group-hover:text-white">
                 Open Race Mode
               </span>
 
               <motion.div
                 aria-hidden="true"
-                className="absolute right-1 z-20 flex h-10 w-10 items-center justify-center rounded-lg border border-white/15 bg-slate-900/90 text-slate-100 shadow-[0_4px_12px_rgba(0,0,0,0.45)]"
+                className="absolute right-1 z-20 flex h-10 w-10 items-center justify-center rounded-lg text-white"
+                style={{
+                  background: "linear-gradient(135deg,  #0085FF 100%, #00428D 80%, #000000 0%)",
+                  boxShadow:
+                    "0 2px 8px rgba(0,0,0,0.22), 0 8px 20px rgba(0,133,255,0.16), inset 0 1.5px 0 rgba(255,255,255,0.3), inset 0 -3px 8px rgba(0,55,130,0.3), inset 0 0 0 1px rgba(255,255,255,0.08)",
+                }}
                 animate={{
                   x: reduceMotion ? 0 : isRaceHovered ? -travelDistance : 0,
                   rotate: reduceMotion ? 0 : isRaceHovered ? 360 : 0,
@@ -425,14 +432,14 @@ const HomeRedesign = () => {
               >
                 <span
                   aria-hidden="true"
-                  className="pointer-events-none absolute left-1/2 top-0 z-20 h-2/5 w-[80%] -translate-x-1/2 rounded-t-[inherit] bg-gradient-to-b from-white/40 via-white/10 to-transparent blur-[0.5px]"
+                  className="pointer-events-none absolute left-1/2 top-0 z-20 h-2/5 w-[80%] -translate-x-1/2 rounded-t-[inherit] bg-gradient-to-b from-white/40 via-white/15 to-transparent blur-[0.5px]"
                 />
                 <span
                   aria-hidden="true"
-                  className="pointer-events-none absolute inset-0 z-0 rounded-[inherit] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.15),inset_0_1.5px_0_rgba(255,255,255,0.2),inset_0_-2px_4px_rgba(0,0,0,0.4)]"
+                  className="pointer-events-none absolute inset-0 z-0 rounded-[inherit] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.15),inset_0_1.5px_0_rgba(255,255,255,0.2),inset_0_-2px_4px_rgba(204,0,102,0.2)]"
                 />
                 <motion.span
-                  className="relative z-30 flex items-center justify-center drop-shadow-sm"
+                  className="relative z-30 flex items-center justify-center drop-shadow-sm text-white"
                   animate={{ rotate: reduceMotion ? 0 : isRaceHovered ? 45 : 0 }}
                   transition={{
                     type: "spring",
@@ -440,7 +447,7 @@ const HomeRedesign = () => {
                     damping: 20,
                   }}
                 >
-                  <ArrowUpRight size={16} strokeWidth={2.2} />
+                  <ArrowUpRight size={16} strokeWidth={2.4} />
                 </motion.span>
               </motion.div>
             </Link>
