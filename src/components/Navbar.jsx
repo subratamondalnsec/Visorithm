@@ -6,10 +6,10 @@ import useAlgorithmStore from "../store/algorithmStore";
 const categoryPath = (category) => category.toLowerCase().replace(/\s+/g, "-");
 const algorithmPath = (algorithm) => algorithm.toLowerCase().replace(/\s+/g, "-");
 
-const Chevron = ({ open }) => (
+const Chevron = ({ open, className = "" }) => (
   <svg
     aria-hidden="true"
-    className={`h-4 w-4 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+    className={`h-4 w-4 transition-transform duration-200 ${open ? "rotate-180" : ""} ${className}`}
     fill="none"
     viewBox="0 0 24 24"
     stroke="currentColor"
@@ -21,14 +21,19 @@ const Chevron = ({ open }) => (
 
 Chevron.propTypes = {
   open: PropTypes.bool.isRequired,
+  className: PropTypes.string,
 };
 
-const SearchIcon = () => (
-  <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+const SearchIcon = ({ className = "h-4 w-4" }) => (
+  <svg aria-hidden="true" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
     <circle cx="11" cy="11" r="6" />
     <path d="m20 20-4.35-4.35" strokeLinecap="round" />
   </svg>
 );
+
+SearchIcon.propTypes = {
+  className: PropTypes.string,
+};
 
 const MenuIcon = () => (
   <svg aria-hidden="true" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
@@ -44,10 +49,10 @@ const CloseIcon = () => (
 
 const StudentIllustration = () => (
   <div className="rounded-full bg-gradient-to-br from-violet-400 via-blue-500 to-cyan-300 p-[2px] shadow-[0_0_16px_rgba(59,130,246,0.24)]">
-    <div className="h-10 w-10 overflow-hidden rounded-full bg-slate-950 lg:h-11 lg:w-11">
+    <div className="h-9 w-9 overflow-hidden rounded-full bg-slate-950 lg:h-10 lg:w-10">
       <img
         src="/images/student-illustration.svg"
-        alt="Decorative student illustration"
+        alt="User profile illustration"
         className="h-full w-full object-contain"
       />
     </div>
@@ -90,18 +95,28 @@ const Navbar = () => {
     }
   };
 
+  const isVisualizerPath =
+    location.pathname.startsWith("/sorting") ||
+    location.pathname.startsWith("/searching") ||
+    location.pathname.startsWith("/graph") ||
+    location.pathname.startsWith("/dynamic-programming") ||
+    location.pathname.startsWith("/greedy-algorithm") ||
+    location.pathname.startsWith("/backtracking") ||
+    location.pathname.startsWith("/tree-algorithms") ||
+    location.pathname.startsWith("/mathematical-algorithms");
+
+  const desktopLinkClass = (path) =>
+    `rounded-lg border px-2.5 py-1.5 text-xs font-semibold transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 min-[1024px]:px-3 min-[1024px]:py-2 min-[1024px]:text-sm ${
+      isVisualizerPath && path === "/sorting/bubble-sort"
+        ? "border-sky-300/45 bg-sky-400/15 text-sky-100 shadow-[0_0_16px_rgba(56,189,248,0.16)]"
+        : "border-transparent text-sky-300 hover:border-sky-400/20 hover:bg-sky-400/10 hover:text-sky-200 hover:shadow-[0_0_14px_rgba(56,189,248,0.10)]"
+    }`;
+
   const navLinkClass = (path) =>
-    `rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 ${
+    `rounded-lg px-2.5 py-1.5 text-xs font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 min-[1024px]:px-3 min-[1024px]:py-2 min-[1024px]:text-sm ${
       location.pathname === path
         ? "border border-sky-400/20 bg-sky-400/10 text-sky-200 shadow-[0_0_14px_rgba(56,189,248,0.08)]"
         : "text-slate-300 hover:bg-slate-800/80 hover:text-slate-100"
-    }`;
-
-  const desktopLinkClass = (path) =>
-    `rounded-lg border px-3 py-2 text-sm font-semibold transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 ${
-      location.pathname === path
-        ? "border-sky-300/45 bg-sky-400/15 text-sky-100 shadow-[0_0_16px_rgba(56,189,248,0.16)]"
-        : "border-transparent text-sky-300 hover:border-sky-400/20 hover:bg-sky-400/10 hover:text-sky-200 hover:shadow-[0_0_14px_rgba(56,189,248,0.10)]"
     }`;
 
   return (
@@ -109,57 +124,28 @@ const Navbar = () => {
       className="fixed inset-x-0 top-0 z-50 border-b border-sky-400/15 bg-slate-950/95 shadow-[0_10px_32px_rgba(2,6,23,0.24)] backdrop-blur-xl"
       aria-label="Primary navigation"
     >
-      <div className="mx-auto grid h-16 w-full max-w-7xl grid-cols-[auto_1fr_auto] items-center gap-2 px-3 min-[600px]:gap-3 min-[600px]:px-4 min-[1024px]:h-[72px] min-[1024px]:gap-6 min-[1024px]:px-8">
+      <div className="relative mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-3 min-[600px]:px-4 min-[1024px]:h-[72px] min-[1024px]:px-8">
+        {/* ================= 1. Visorithm Logo & Title ================= */}
         <Link
           to="/"
           className="flex shrink-0 items-center gap-1.5 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300"
         >
-          <img src="images/logo.png" alt="Visorithm" className="h-9 w-9 rounded-lg object-contain" />
-          <span className="bg-gradient-to-r from-sky-400 to-blue-600 bg-clip-text text-lg font-semibold tracking-tight text-transparent">Visorithm</span>
+          <img src="/images/logo.png" alt="Visorithm" className="h-8 w-8 min-[1024px]:h-9 min-[1024px]:w-9 rounded-lg object-contain" />
+          <span className="bg-gradient-to-r from-sky-400 to-blue-600 bg-clip-text text-base min-[1024px]:text-lg font-semibold tracking-tight text-transparent">
+            Visorithm
+          </span>
         </Link>
 
-        <div className="hidden min-w-0 items-center justify-center gap-1.5 min-[600px]:flex min-[700px]:gap-2 min-[1024px]:gap-3">
+        {/* ================= 2. Center Trio: Visualizer -> Explore Algorithms -> Open Race ================= */}
+        <div className="hidden min-[600px]:flex items-center gap-1.5 min-[700px]:gap-2 min-[1024px]:gap-2.5 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-30">
           <Link
             to="/sorting/bubble-sort"
-            className={`${desktopLinkClass("/sorting/bubble-sort")} px-2 text-xs min-[1024px]:px-3 min-[1024px]:text-sm`}
+            className={`${desktopLinkClass("/sorting/bubble-sort")} whitespace-nowrap`}
           >
             Visualizer
           </Link>
 
-          <div className="relative w-32 min-[700px]:w-36 min-[850px]:w-44 min-[1024px]:w-52 min-[1280px]:w-60 min-[1440px]:w-64">
-            <input
-              type="search"
-              value={searchQuery}
-              onChange={handleSearch}
-              placeholder="Search algorithms..."
-              aria-label="Search algorithms"
-              className="h-9 w-full rounded-lg border border-sky-400/15 bg-slate-900/90 py-2 pl-8 pr-2 text-xs text-slate-100 placeholder:text-slate-500 shadow-inner shadow-slate-950/30 outline-none transition-all duration-200 focus:border-sky-400/45 focus:ring-2 focus:ring-sky-400/20 min-[1024px]:h-10 min-[1024px]:pl-9 min-[1024px]:pr-3 min-[1024px]:text-sm"
-            />
-            <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500 min-[1024px]:left-3">
-              <SearchIcon />
-            </span>
-            {searchQuery && (
-              <div className="absolute left-0 top-[calc(100%+8px)] z-20 max-h-72 w-full overflow-y-auto rounded-xl border border-sky-400/15 bg-slate-900/98 p-1.5 shadow-xl shadow-slate-950/60">
-                {searchResults.length ? (
-                  searchResults.map((result) => (
-                    <button
-                      key={`${result.category}-${result.name}`}
-                      type="button"
-                      onMouseDown={(event) => event.preventDefault()}
-                      onClick={() => selectAlgorithm(result.category, result.name)}
-                      className="flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left text-sm transition-all duration-150 hover:bg-sky-400/10 hover:text-sky-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300"
-                    >
-                      <span className="font-medium text-slate-200">{result.name}</span>
-                      <span className="text-xs text-slate-500">{result.category}</span>
-                    </button>
-                  ))
-                ) : (
-                  <p className="px-3 py-2 text-sm text-slate-500">No algorithms found.</p>
-                )}
-              </div>
-            )}
-          </div>
-
+          {/* Explore Algorithms Button with Centered Hover Dropdown */}
           <div
             ref={exploreRef}
             className="relative"
@@ -175,38 +161,50 @@ const Navbar = () => {
               aria-controls="explore-algorithms-menu"
               onClick={() => setIsExploreOpen((open) => !open)}
               onFocus={() => setIsExploreOpen(true)}
-              className={`flex items-center gap-1 rounded-lg px-2 py-2 text-xs font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 min-[1024px]:px-3 min-[1024px]:text-sm ${
+              className={`flex items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 min-[1024px]:px-3.5 min-[1024px]:py-2 min-[1024px]:text-sm ${
                 isExploreOpen
-                  ? "border border-sky-400/20 bg-sky-400/10 text-sky-100"
-                  : "border border-transparent text-slate-300 hover:bg-slate-800/80 hover:text-slate-100"
+                  ? "border border-sky-400/40 bg-sky-400/15 text-sky-100 shadow-[0_0_16px_rgba(56,189,248,0.2)]"
+                  : "border border-sky-400/20 bg-slate-900/80 text-sky-200 hover:border-sky-400/35 hover:bg-sky-400/10 hover:text-white hover:shadow-[0_0_12px_rgba(56,189,248,0.12)]"
               }`}
             >
-              <span>Explore <span className="hidden min-[1024px]:inline">Algorithms</span></span> <Chevron open={isExploreOpen} />
+              <span>Explore <span className="hidden min-[1024px]:inline">Algorithms</span></span>
+              <Chevron open={isExploreOpen} />
             </button>
 
+            {/* Centered Dropdown Menu Directly Beneath Explore Algorithms */}
             <div
               id="explore-algorithms-menu"
               role="menu"
               aria-label="Explore algorithms"
-              className={`absolute left-1/2 top-full mt-3 max-h-[calc(100vh-6rem)] w-[min(1000px,calc(100vw-3rem))] -translate-x-1/2 overflow-y-auto origin-top rounded-2xl border border-sky-300/15 bg-slate-900/98 p-4 shadow-2xl shadow-slate-950/60 transition-all duration-200 max-[1023px]:fixed max-[1023px]:top-[72px] max-[1023px]:mt-0 max-[1023px]:w-[calc(100vw-2rem)] ${
+              className={`absolute left-1/2 top-full mt-2.5 max-h-[calc(100vh-6rem)] w-[min(1000px,calc(100vw-2rem))] -translate-x-1/2 overflow-y-auto origin-top rounded-2xl border border-sky-300/15 bg-slate-900/98 p-4 shadow-2xl shadow-slate-950/60 transition-all duration-200 before:absolute before:-top-3 before:h-3 before:inset-x-0 before:content-[''] ${
                 isExploreOpen
-                  ? "visible translate-y-0 opacity-100"
-                  : "invisible -translate-y-1 opacity-0"
+                  ? "visible translate-y-0 opacity-100 pointer-events-auto"
+                  : "invisible -translate-y-1 opacity-0 pointer-events-none"
               }`}
             >
               <div className="mb-3 flex items-center justify-between gap-4 border-b border-slate-700/80 pb-2.5">
                 <div className="flex items-center gap-2">
-                  <span className="rounded-md bg-sky-400/10 p-1.5 text-sky-300"><SearchIcon /></span>
+                  <span className="rounded-md bg-sky-400/10 p-1.5 text-sky-300">
+                    <SearchIcon className="h-4 w-4" />
+                  </span>
                   <div>
                     <p className="text-sm font-semibold text-slate-100">Explore Algorithms</p>
                     <p className="text-xs text-slate-400">Choose an algorithm to visualize</p>
                   </div>
                 </div>
               </div>
+
               <div className="grid grid-cols-2 gap-3 min-[1024px]:grid-cols-4">
                 {Object.entries(algorithmCategories).map(([category, algorithms]) => (
-                  <section key={category} aria-label={category} className="min-w-0 rounded-lg border border-slate-800/80 bg-slate-950/35 p-2.5">
-                    <h2 className="mb-1.5 truncate border-b border-slate-800 pb-1.5 text-[11px] font-bold uppercase leading-tight tracking-[0.12em] text-sky-300" title={category}>
+                  <section
+                    key={category}
+                    aria-label={category}
+                    className="min-w-0 rounded-lg border border-slate-800/80 bg-slate-950/35 p-2.5 transition-colors hover:border-slate-700"
+                  >
+                    <h2
+                      className="mb-1.5 truncate border-b border-slate-800 pb-1.5 text-[11px] font-bold uppercase leading-tight tracking-[0.12em] text-sky-300"
+                      title={category}
+                    >
                       {category}
                     </h2>
                     <div className="space-y-px">
@@ -230,46 +228,103 @@ const Navbar = () => {
             </div>
           </div>
 
-          <Link to="/race-mode" className={`${navLinkClass("/race-mode")} hidden min-[1024px]:block`}>
-            Open Race Mode
+          <Link
+            to="/race-mode"
+            className={`${navLinkClass("/race-mode")} whitespace-nowrap`}
+          >
+            Open Race
           </Link>
         </div>
 
-        <div className="hidden shrink-0 items-center min-[600px]:flex">
-          <StudentIllustration />
+        {/* ================= 3. Right: Search & Profile ================= */}
+        <div className="flex items-center gap-1.5 min-[700px]:gap-2 min-[1024px]:gap-2.5">
+          {/* Search Box */}
+          <div className="relative hidden min-[600px]:block w-28 min-[700px]:w-36 min-[850px]:w-44 min-[1024px]:w-52 min-[1280px]:w-60">
+            <input
+              type="search"
+              value={searchQuery}
+              onChange={handleSearch}
+              placeholder="Search algorithms..."
+              aria-label="Search algorithms"
+              className="h-9 w-full rounded-lg border border-sky-400/15 bg-slate-900/90 py-1.5 pl-8 pr-2 text-xs text-slate-100 placeholder:text-slate-500 shadow-inner shadow-slate-950/30 outline-none transition-all duration-200 focus:border-sky-400/45 focus:ring-2 focus:ring-sky-400/20 min-[1024px]:h-10 min-[1024px]:pl-9 min-[1024px]:pr-3 min-[1024px]:text-sm"
+            />
+            <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500 min-[1024px]:left-3">
+              <SearchIcon className="h-3.5 w-3.5 min-[1024px]:h-4 min-[1024px]:w-4" />
+            </span>
+            {searchQuery && (
+              <div className="absolute right-0 top-[calc(100%+8px)] z-50 max-h-72 w-64 min-[850px]:w-72 overflow-y-auto rounded-xl border border-sky-400/15 bg-slate-900/98 p-1.5 shadow-xl shadow-slate-950/60 backdrop-blur-xl">
+                {searchResults.length ? (
+                  searchResults.map((result) => (
+                    <button
+                      key={`${result.category}-${result.name}`}
+                      type="button"
+                      onMouseDown={(event) => event.preventDefault()}
+                      onClick={() => selectAlgorithm(result.category, result.name)}
+                      className="flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-left text-xs min-[1024px]:text-sm transition-all duration-150 hover:bg-sky-400/10 hover:text-sky-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300"
+                    >
+                      <span className="font-medium text-slate-200 truncate">{result.name}</span>
+                      <span className="text-xs text-slate-500 shrink-0">{result.category}</span>
+                    </button>
+                  ))
+                ) : (
+                  <p className="px-3 py-2 text-xs min-[1024px]:text-sm text-slate-500">No algorithms found.</p>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Profile Avatar */}
+          <div className="hidden shrink-0 items-center min-[600px]:flex">
+            <StudentIllustration />
+          </div>
+
+          {/* Mobile Menu Button (< 600px) */}
+          <button
+            type="button"
+            className="justify-self-end rounded-lg p-2 text-slate-200 transition-colors hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 min-[600px]:hidden"
+            aria-label={isMobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={isMobileMenuOpen}
+            onClick={() => setIsMobileMenuOpen((open) => !open)}
+          >
+            {isMobileMenuOpen ? <CloseIcon /> : <MenuIcon />}
+          </button>
         </div>
-        <button
-          type="button"
-          className="justify-self-end rounded-lg p-2 text-slate-200 transition-colors hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 min-[600px]:hidden"
-          aria-label={isMobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
-          aria-expanded={isMobileMenuOpen}
-          onClick={() => setIsMobileMenuOpen((open) => !open)}
-        >
-          {isMobileMenuOpen ? <CloseIcon /> : <MenuIcon />}
-        </button>
       </div>
 
+      {/* ================= Mobile Menu (< 600px) ================= */}
       {isMobileMenuOpen && (
         <div className="border-t border-slate-800 bg-slate-950 px-4 py-3 shadow-2xl min-[600px]:hidden">
-          <div className="mx-auto max-w-7xl space-y-1">
-            <Link onClick={() => setIsMobileMenuOpen(false)} to="/sorting/bubble-sort" className="block rounded-lg border border-sky-400/15 bg-sky-400/10 px-3 py-3 text-sm font-semibold text-sky-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300">
+          <div className="mx-auto max-w-7xl space-y-2">
+            <Link
+              onClick={() => setIsMobileMenuOpen(false)}
+              to="/sorting/bubble-sort"
+              className="block rounded-lg border border-sky-400/15 bg-sky-400/10 px-3 py-2.5 text-sm font-semibold text-sky-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300"
+            >
               Visualizer
             </Link>
-            <div className="relative px-1 py-2">
+
+            <div className="relative py-1">
               <input
                 type="search"
                 value={searchQuery}
                 onChange={handleSearch}
                 placeholder="Search algorithms..."
                 aria-label="Search algorithms"
-                className="h-11 w-full rounded-lg border border-sky-400/15 bg-slate-900/90 py-2 pl-10 pr-3 text-sm text-slate-100 placeholder:text-slate-500 shadow-inner shadow-slate-950/30 outline-none transition-all duration-200 focus:border-sky-400/45 focus:ring-2 focus:ring-sky-400/20"
+                className="h-10 w-full rounded-lg border border-sky-400/15 bg-slate-900/90 py-2 pl-9 pr-3 text-sm text-slate-100 placeholder:text-slate-500 shadow-inner shadow-slate-950/30 outline-none transition-all duration-200 focus:border-sky-400/45 focus:ring-2 focus:ring-sky-400/20"
               />
-              <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"><SearchIcon /></span>
+              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">
+                <SearchIcon />
+              </span>
               {searchQuery && (
-                <div className="absolute inset-x-1 top-[calc(100%+2px)] z-20 max-h-56 overflow-y-auto rounded-xl border border-sky-400/15 bg-slate-900/98 p-1.5 shadow-xl shadow-slate-950/60">
+                <div className="absolute inset-x-0 top-[calc(100%+2px)] z-50 max-h-56 overflow-y-auto rounded-xl border border-sky-400/15 bg-slate-900/98 p-1.5 shadow-xl shadow-slate-950/60">
                   {searchResults.length ? (
                     searchResults.map((result) => (
-                      <button key={`${result.category}-${result.name}`} type="button" onClick={() => selectAlgorithm(result.category, result.name)} className="flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left text-sm transition-all duration-150 hover:bg-sky-400/10 hover:text-sky-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300">
+                      <button
+                        key={`${result.category}-${result.name}`}
+                        type="button"
+                        onClick={() => selectAlgorithm(result.category, result.name)}
+                        className="flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left text-sm transition-all duration-150 hover:bg-sky-400/10 hover:text-sky-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300"
+                      >
                         <span className="font-medium text-slate-200">{result.name}</span>
                         <span className="text-xs text-slate-500">{result.category}</span>
                       </button>
@@ -280,27 +335,46 @@ const Navbar = () => {
                 </div>
               )}
             </div>
+
             <div className="rounded-lg border border-slate-800 bg-slate-900/70">
-              <button type="button" className="flex w-full items-center justify-between px-3 py-3 text-left text-sm font-medium text-slate-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sky-300" aria-expanded={isMobileExploreOpen} onClick={() => setIsMobileExploreOpen((open) => !open)}>
-                Explore Algorithms <Chevron open={isMobileExploreOpen} />
+              <button
+                type="button"
+                className="flex w-full items-center justify-between px-3 py-2.5 text-left text-sm font-medium text-slate-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sky-300"
+                aria-expanded={isMobileExploreOpen}
+                onClick={() => setIsMobileExploreOpen((open) => !open)}
+              >
+                <span>Explore Algorithms</span>
+                <Chevron open={isMobileExploreOpen} />
               </button>
               {isMobileExploreOpen && (
-                <div className="grid max-h-[55vh] grid-cols-1 gap-4 overflow-y-auto border-t border-slate-800 px-3 py-4 sm:grid-cols-2">
+                <div className="grid max-h-[55vh] grid-cols-1 gap-3 overflow-y-auto border-t border-slate-800 px-3 py-3 sm:grid-cols-2">
                   {Object.entries(algorithmCategories).map(([category, algorithms]) => (
                     <section key={category}>
                       <h2 className="mb-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-sky-300">{category}</h2>
-                      {algorithms.map((algorithm) => (
-                        <button key={algorithm} type="button" onClick={() => selectAlgorithm(category, algorithm)} className="block w-full rounded-md px-2 py-2 text-left text-sm text-slate-300 hover:bg-sky-400/10 hover:text-sky-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300">
-                          {algorithm}
-                        </button>
-                      ))}
+                      <div className="space-y-0.5">
+                        {algorithms.map((algorithm) => (
+                          <button
+                            key={algorithm}
+                            type="button"
+                            onClick={() => selectAlgorithm(category, algorithm)}
+                            className="block w-full rounded-md px-2 py-1.5 text-left text-sm text-slate-300 hover:bg-sky-400/10 hover:text-sky-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300"
+                          >
+                            {algorithm}
+                          </button>
+                        ))}
+                      </div>
                     </section>
                   ))}
                 </div>
               )}
             </div>
-            <Link onClick={() => setIsMobileMenuOpen(false)} to="/race-mode" className="block rounded-lg px-3 py-3 text-sm font-medium text-slate-200 hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300">
-              Open Race Mode
+
+            <Link
+              onClick={() => setIsMobileMenuOpen(false)}
+              to="/race-mode"
+              className="block rounded-lg px-3 py-2.5 text-sm font-medium text-slate-200 hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300"
+            >
+              Open Race
             </Link>
           </div>
         </div>
