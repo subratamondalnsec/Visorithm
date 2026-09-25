@@ -5,6 +5,7 @@ import { ArrowUpRight } from "lucide-react";
 import { AnimatedBars } from "./ui/animated-bars";
 import { TextFrame } from "./ui/text-frame";
 import TextHoverEffect from "./home/TextHoverEffect";
+import ScrollImageStack from "./home/ScrollImageStack";
 import Seo from "./Seo";
 import { Logo } from "@/components/ui/icons/logo";
 
@@ -456,6 +457,9 @@ const HomeRedesign = () => {
           {/* TODO: Add Visorithm Hero Illustration */}
         </div>
       </AnimatedBars>
+
+
+      <ScrollImageStack />
 
       <main
         id="explore"
