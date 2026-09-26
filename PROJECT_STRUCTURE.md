@@ -419,3 +419,7 @@ Key homepage-related files:
 - Ensure icon assets in `public/icons/` match `public/manifest.json` before PWA distribution.
 - Refresh sitemap `lastmod` dates upon new releases.
 - Run `npm run lint` and `npm run build` as part of CI validation.
+
+
+
+
