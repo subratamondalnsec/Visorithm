@@ -1,21 +1,32 @@
 import { useState, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { ArrowUpRight } from "lucide-react";
+import { motion, useReducedMotion } from "motion/react";
+import { ArrowUpRight, ArrowUpDown, Share2, TreePine, Grid3x3, Gem, Search } from "lucide-react";
 import { AnimatedBars } from "./ui/animated-bars";
 import { TextFrame } from "./ui/text-frame";
 import TextHoverEffect from "./home/TextHoverEffect";
+import TrustedByDSASection from "./home/TrustedByDSASection";
 import ScrollImageStack from "./home/ScrollImageStack";
+import ExploreAccordion from "./home/ExploreAccordion";
+import Aboutme from "./home/AboutMe"
+import ProjectCTASection from "./home/ProjectCTASection"
+import Footer from "./home/Footer";
+
 import Seo from "./Seo";
 import { Logo } from "@/components/ui/icons/logo";
 
+// One distinct lucide icon per category - chosen so none of them repeats
+// an icon already used by one of that category's own algorithm rows
+// (see algorithmIcons.js). These are components, not strings, and are
+// rendered with <Icon .../> inside ExploreAccordion.
+
 const icons = {
-  Sorting: "↕",
-  Graph: "⌘",
-  Tree: "⌘",
-  "Dynamic Programming": "▦",
-  Greedy: "◈",
-  Searching: "⌕",
+  Sorting: ArrowUpDown,
+  Graph: Share2,
+  Tree: TreePine,
+  "Dynamic Programming": Grid3x3,
+  Greedy: Gem,
+  Searching: Search,
 };
 
 const categories = [
@@ -213,102 +224,7 @@ const categories = [
   },
 ];
 
-function CategoryCard({ category, open, onToggle }) {
-  const reduceMotion = useReducedMotion();
-
-  return (
-    <motion.article
-      layout
-      initial={{ opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.15 }}
-      transition={{ duration: reduceMotion ? 0 : 0.35 }}
-      className="overflow-hidden rounded-2xl border border-slate-700/70 bg-[#111827]/90 shadow-[0_12px_40px_rgba(2,6,23,0.24)] transition-colors hover:border-blue-400/50 hover:bg-[#172137]"
-    >
-      <button
-        type="button"
-        onClick={onToggle}
-        aria-expanded={open}
-        aria-controls={`${category.name}-algorithms`}
-        className="group flex w-full items-center gap-4 p-5 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-400 sm:p-6"
-      >
-        <span
-          className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border border-blue-400/20 bg-blue-500/10 text-xl font-semibold text-blue-300 transition-transform group-hover:scale-105"
-          aria-hidden="true"
-        >
-          {icons[category.name]}
-        </span>
-
-        <span className="min-w-0 flex-1">
-          <span className="block text-base font-semibold tracking-tight text-slate-100">
-            {category.name} Algorithms
-          </span>
-
-          <span className="mt-1 block text-sm text-slate-400">
-            {category.items.length} algorithms available
-          </span>
-        </span>
-
-        <span
-          className={`grid h-8 w-8 place-items-center rounded-full border border-slate-700 text-blue-300 transition-transform duration-300 ${
-            open ? "rotate-180 bg-blue-500/10" : ""
-          }`}
-          aria-hidden="true"
-        >
-          ⌄
-        </span>
-      </button>
-
-      <AnimatePresence initial={false}>
-        {open && (
-          <motion.div
-            id={`${category.name}-algorithms`}
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{
-              duration: reduceMotion ? 0 : 0.25,
-              ease: "easeOut",
-            }}
-          >
-            <div className="border-t border-slate-700/70 px-5 pb-5 pt-3 sm:px-6 sm:pb-6">
-              {category.items.map(([id, title, difficulty, note]) => (
-                <Link
-                  key={id}
-                  to={category.path.replace(":algorithm", id)}
-                  className="group/item block rounded-xl px-3 py-3 transition-colors hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
-                >
-                  <span className="flex items-center justify-between gap-3">
-                    <span className="font-medium text-slate-200 group-hover/item:text-blue-300">
-                      {title}
-                    </span>
-
-                    <span
-                      className={`rounded-full border px-2 py-0.5 text-xs ${
-                        difficulty === "Easy"
-                          ? "border-blue-400/25 bg-blue-400/10 text-blue-300"
-                          : "border-slate-600 bg-slate-800 text-slate-400"
-                      }`}
-                    >
-                      {difficulty}
-                    </span>
-                  </span>
-
-                  <span className="mt-1 block text-sm leading-5 text-slate-400">
-                    {note}
-                  </span>
-                </Link>
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.article>
-  );
-}
-
 const HomeRedesign = () => {
-  const [openCategory, setOpenCategory] = useState("Sorting");
   const [isRaceHovered, setIsRaceHovered] = useState(false);
   const [travelDistance, setTravelDistance] = useState(0);
   const reduceMotion = useReducedMotion();
@@ -322,7 +238,7 @@ const HomeRedesign = () => {
   }, []);
 
   return (
-    <div className="min-h-screen overflow-hidden bg-[#0F172B] text-slate-100">
+    <div className="min-h-screen overflow-x-hidden bg-[#0F172B] text-slate-100">
       <Seo
         title="Visorithm — Interactive Algorithm Visualization"
         description="Visualize algorithms, understand core concepts, and master DSA through focused interactive learning."
@@ -341,7 +257,7 @@ const HomeRedesign = () => {
           <TextHoverEffect className="max-w-4xl text-5xl font-semibold tracking-[-0.055em] text-slate-100 sm:text-7xl">
             Visorithm
           </TextHoverEffect>
-
+ 
           <p className="mt-7 max-w-2xl text-xl font-medium leading-relaxed text-slate-400 sm:text-2xl">
             Visualize algorithms. Understand concepts.{" "}
             <TextFrame className="mx-1 text-sky-400 [&_svg]:text-sky-400 tracking-normal selection:bg-blue-900 selection:text-cyan-50">
@@ -350,12 +266,12 @@ const HomeRedesign = () => {
               </span>
             </TextFrame>
           </p>
-
+ 
           <p className="mt-5 max-w-xl text-base leading-7 text-slate-500">
             Explore each step, connect theory to motion, and develop the
             intuition that makes problem solving stick.
           </p>
-
+ 
           {/* CTA group */}
           <div className="mt-9 flex w-full flex-col items-center gap-3 sm:w-auto sm:flex-row">
             {/* Explore Algorithms */}
@@ -367,28 +283,28 @@ const HomeRedesign = () => {
                 aria-hidden="true"
                 className="pointer-events-none absolute inset-x-1 top-0 h-1/2 rounded-t-[inherit] bg-gradient-to-b from-white/25 to-transparent opacity-90"
               />
-
+ 
               <span
                 aria-hidden="true"
                 className="pointer-events-none absolute -left-20 top-0 h-full w-16 -skew-x-12 bg-white/15 blur-md transition-transform duration-700 ease-out group-hover:translate-x-[340px]"
               />
-
+ 
               <span
                 aria-hidden="true"
                 className="pointer-events-none absolute inset-0 rounded-[inherit] ring-1 ring-inset ring-white/85 transition-all duration-300 group-hover:ring-white"
               />
-
+ 
               <span className="relative z-10 flex items-center gap-1.5">
                 {/* Visorithm Logo — rendered as black */}
                 <Logo
                   className="h-6 w-auto shrink-0 object-contain brightness-0 drop-shadow-[0_1px_1px_rgba(0,0,0,0.35)] transition-transform duration-200 group-hover:scale-105"
                   aria-hidden="true"
                 />
-
+ 
                 <span className="font-semibold text-white">Explore Algorithms</span>
               </span>
             </a>
-
+ 
             {/* Open Race Mode */}
             <Link
               ref={raceBtnRef}
@@ -402,17 +318,17 @@ const HomeRedesign = () => {
                 aria-hidden="true"
                 className="pointer-events-none absolute inset-0 bg-gradient-to-r from-white/[0.03] via-white/[0.08] to-white/[0.03] opacity-70 transition-opacity duration-300 group-hover:opacity-100"
               />
-
+ 
               {/* Subtle white contour ring */}
               <span
                 aria-hidden="true"
                 className="pointer-events-none absolute inset-0 rounded-[inherit] ring-1 ring-inset ring-white/15 transition-all duration-300 group-hover:ring-white/30"
               />
-
+ 
               <span className="relative z-10 whitespace-nowrap text-slate-100 transition-all duration-500 group-hover:text-white">
                 Open Race Mode
               </span>
-
+ 
               <motion.div
                 aria-hidden="true"
                 className="absolute right-1 z-20 flex h-10 w-10 items-center justify-center rounded-lg text-white"
@@ -453,11 +369,14 @@ const HomeRedesign = () => {
               </motion.div>
             </Link>
           </div>
-
+ 
           {/* TODO: Add Visorithm Hero Illustration */}
         </div>
       </AnimatedBars>
 
+      {/* Infinite marquee of every algorithm on the site, built from the
+          same `categories` and `icons` defined above - no duplicated data. */}
+      <TrustedByDSASection categories={categories} icons={icons} />
 
       <ScrollImageStack />
 
@@ -480,51 +399,22 @@ const HomeRedesign = () => {
           </p>
         </div>
 
-        <div className="mt-10 grid items-start gap-5 md:grid-cols-2">
-          {categories.map((category) => (
-            <CategoryCard
-              key={category.name}
-              category={category}
-              open={openCategory === category.name}
-              onToggle={() =>
-                setOpenCategory(
-                  openCategory === category.name ? null : category.name
-                )
-              }
-            />
-          ))}
+        <div className="mt-10">
+          <ExploreAccordion
+            categories={categories}
+            icons={icons}
+            defaultOpen="Sorting"
+          />
         </div>
       </main>
 
-      <footer className="border-t border-slate-800 bg-[#111827]">
-        <div className="mx-auto flex max-w-6xl flex-col gap-8 px-6 py-10 sm:px-8 md:flex-row md:items-end md:justify-between">
-          <div>
-            <span className="text-lg font-semibold tracking-tight text-white">
-              Visorithm
-            </span>
+      <Aboutme />
+       <ProjectCTASection/> 
+      {/* Footer: nav block + the scroll-animated "Visorithm" wordmark
+          (dot-morph + glass ornaments). See ./home/Footer.jsx and
+          ./home/FooterWordmark.jsx. */}
+      <Footer categories={categories} />
 
-            <p className="mt-2 max-w-sm text-sm leading-6 text-slate-400">
-              A focused place to see algorithms work, one decision at a time.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap gap-x-6 gap-y-3 text-sm text-slate-400">
-            {/* TODO: Add GitHub Link */}
-            <span>GitHub</span>
-
-            {/* TODO: Add LinkedIn Link */}
-            <span>LinkedIn</span>
-
-            {/* TODO: Add Portfolio Link */}
-            <span>Documentation</span>
-          </div>
-        </div>
-
-        <div className="mx-auto max-w-6xl border-t border-slate-800 px-6 py-5 text-xs text-slate-500 sm:px-8">
-          © {new Date().getFullYear()} Visorithm. Built for deliberate
-          practice.
-        </div>
-      </footer>
     </div>
   );
 };
