@@ -1,5 +1,5 @@
-import { useRef } from "react";
-import { motion, useScroll, useTransform, useReducedMotion } from "motion/react";
+import { useRef, useState } from "react";
+import { motion, useScroll, useTransform, useReducedMotion, useMotionValueEvent } from "motion/react";
 
 /**
  * FooterWordmark
@@ -80,6 +80,10 @@ export default function FooterWordmark({ text = "Visorithm", splitAt = 5, cardRe
     offset: ["start 90%", "start 25%"],
   });
 
+  // DEBUG: live readout of scrollYProgress — REMOVE after timing check.
+  const [debugProgress, setDebugProgress] = useState(0);
+  useMotionValueEvent(scrollYProgress, "change", (v) => setDebugProgress(v));
+
   const purpleScale = useTransform(scrollYProgress, PROGRESS_STOPS, PURPLE_SCALE_STOPS);
   const whiteScale = useTransform(scrollYProgress, PROGRESS_STOPS, WHITE_SCALE_STOPS);
   const purpleTransform = useTransform(purpleScale, (s) => `perspective(1200px) scale(${s})`);
@@ -97,7 +101,7 @@ export default function FooterWordmark({ text = "Visorithm", splitAt = 5, cardRe
   if (reduceMotion) {
     // Static, fully-settled state -- no scroll-linked motion at all.
     return (
-      <div ref={localRef} className="relative select-none">
+      <div ref={localRef} className="relative z-10 select-none">
         <Ornaments style={{ opacity: 1 }} />
         <Wordmark
           before={before}
@@ -110,7 +114,17 @@ export default function FooterWordmark({ text = "Visorithm", splitAt = 5, cardRe
   }
 
   return (
-    <div ref={localRef} className="relative select-none">
+    <>
+    {/* DEBUG overlay — REMOVE after timing check */}
+    <div style={{
+      position: "fixed", bottom: 12, left: 12, zIndex: 99999,
+      background: "rgba(0,0,0,0.75)", color: "#0f0",
+      fontFamily: "monospace", fontSize: 11, padding: "4px 8px",
+      borderRadius: 4, pointerEvents: "none", lineHeight: 1.4,
+    }}>
+      footer scrollYProgress: {debugProgress.toFixed(4)}
+    </div>
+    <div ref={localRef} className="relative z-10 select-none">
       <Ornaments
         aStyle={{ y: riseA, opacity: fadeA }}
         bStyle={{ y: riseB, opacity: fadeB }}
@@ -123,6 +137,7 @@ export default function FooterWordmark({ text = "Visorithm", splitAt = 5, cardRe
         whiteStyle={{ transform: whiteTransform }}
       />
     </div>
+    </>
   );
 }
 
