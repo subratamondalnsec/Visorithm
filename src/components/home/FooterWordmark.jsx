@@ -17,13 +17,13 @@ if (typeof window !== "undefined") {
  */
 
 /* ─── Resting dot geometry (em, relative to the h2 font-size) ───────── */
-const DOT_TOP_EM = -0.42;       
-const PURPLE_SIZE_EM = 0.22;    
+const DOT_TOP_EM = 0.03;       
+const PURPLE_SIZE_EM = 0.12;    
 const WHITE_SIZE_EM = 0.13;     
 
 /* ─── Peak scale (progress = 0) ──────────────────────────────────────── */
 const PEAK_SCALE_PURPLE = 80;
-const PEAK_SCALE_WHITE = 27;
+const PEAK_SCALE_WHITE = 55;
 
 /* ─── White circle top: centered inside purple ──────────────────────── */
 const WHITE_TOP_EM = DOT_TOP_EM + (PURPLE_SIZE_EM - WHITE_SIZE_EM) / 2;
@@ -52,22 +52,23 @@ export default function FooterWordmark({ text = "Visorithm", splitAt = 5, cardRe
         trigger: target,
         start: "top bottom", // Top of footer enters bottom of viewport
         end: "bottom bottom", // Bottom of footer hits bottom of viewport
-        scrub: 1, // Smooth scrubbing lag
+        scrub: 2, // INCREASED for a very buttery smooth lag
       },
     });
 
     // We start from massive and animate to scale 1.
-    // Using "expo.out" replicates the steep exponential decay of the original physics.
     gsap.set(purpleRef.current, { scale: PEAK_SCALE_PURPLE });
     gsap.set(whiteRef.current, { scale: PEAK_SCALE_WHITE });
 
     tl.to(purpleRef.current, {
       scale: 1,
       ease: "expo.out",
+      duration: 2
     }, 0)
     .to(whiteRef.current, {
       scale: 1,
-      ease: "expo.out",
+      ease: "power4.out", // Different ease + shorter duration = grows much faster!
+      duration: 1.25
     }, 0);
 
     return () => {
@@ -80,7 +81,7 @@ export default function FooterWordmark({ text = "Visorithm", splitAt = 5, cardRe
     <div ref={localRef} className="relative z-10 select-none">
       <h2
         className="relative z-0 m-0 text-center font-extrabold leading-[0.85] tracking-tight text-white drop-shadow-[0_4px_16px_rgba(11,17,32,0.8)]
-                   text-[16vw] sm:text-[13vw] lg:text-[10vw]"
+                   text-[22vw] sm:text-[18vw] lg:text-[15vw]"
         aria-label={`${before}i${after}`}
       >
         {before}
