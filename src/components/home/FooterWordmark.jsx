@@ -47,13 +47,11 @@ export default function FooterWordmark({ text = "Visorithm", splitAt = 5, cardRe
   const before = text.slice(0, splitAt);
   const after  = text.slice(splitAt + 1);
 
-  const localRef    = useRef(null);
-  const shouldReduce = useReducedMotion();
+  const localRef = useRef(null);
 
   /* ── Scroll progress ─────────────────────────────────────────────── */
   // Use "start end" (starts when top of footer enters view)
-  // to "end end" (finishes when bottom of footer hits bottom of screen)
-  // This ensures the animation completes fully even on large monitors!
+  // to "end bottom" (finishes when bottom of footer hits bottom of screen)
   const { scrollYProgress } = useScroll({
     target: cardRef ?? localRef,
     offset: ["start end", "end end"],
@@ -61,16 +59,29 @@ export default function FooterWordmark({ text = "Visorithm", splitAt = 5, cardRe
 
   /* ── Scale MotionValues (Shrink from massive down to dot) ────────── */
   // As user scrolls down (progress 0 -> 1), circles SHRINK from PEAK down to 1.
-  // We use exponential decay for a physically smooth shrinking feel.
-  const purpleScale = useTransform(scrollYProgress, (p) => {
-    const progress = Math.max(0, Math.min(1, p));
-    return PEAK_SCALE_PURPLE * Math.pow(1 / PEAK_SCALE_PURPLE, progress);
-  });
+  const purpleScale = useTransform(
+    scrollYProgress,
+    [0, 0.25, 0.5, 0.75, 1],
+    [
+      PEAK_SCALE_PURPLE,
+      PEAK_SCALE_PURPLE * Math.pow(1 / PEAK_SCALE_PURPLE, 0.25),
+      PEAK_SCALE_PURPLE * Math.pow(1 / PEAK_SCALE_PURPLE, 0.5),
+      PEAK_SCALE_PURPLE * Math.pow(1 / PEAK_SCALE_PURPLE, 0.75),
+      1
+    ]
+  );
 
-  const whiteScale = useTransform(scrollYProgress, (p) => {
-    const progress = Math.max(0, Math.min(1, p));
-    return PEAK_SCALE_WHITE * Math.pow(1 / PEAK_SCALE_WHITE, progress);
-  });
+  const whiteScale = useTransform(
+    scrollYProgress,
+    [0, 0.25, 0.5, 0.75, 1],
+    [
+      PEAK_SCALE_WHITE,
+      PEAK_SCALE_WHITE * Math.pow(1 / PEAK_SCALE_WHITE, 0.25),
+      PEAK_SCALE_WHITE * Math.pow(1 / PEAK_SCALE_WHITE, 0.5),
+      PEAK_SCALE_WHITE * Math.pow(1 / PEAK_SCALE_WHITE, 0.75),
+      1
+    ]
+  );
 
   /* ── Ornament MotionValues ───────────────────────────────────────── */
   const fadeA = useTransform(scrollYProgress, ORN_A.fade, [0, 1]);
@@ -79,21 +90,6 @@ export default function FooterWordmark({ text = "Visorithm", splitAt = 5, cardRe
   const riseB = useTransform(scrollYProgress, ORN_B.rise, [36, 0]);
   const fadeC = useTransform(scrollYProgress, ORN_C.fade, [0, 1]);
   const riseC = useTransform(scrollYProgress, ORN_C.rise, [24, 0]);
-
-  /* ── Reduced-motion: fully settled, static ───────────────────────── */
-  if (shouldReduce) {
-    return (
-      <div ref={localRef} className="relative z-10 select-none">
-        <Ornaments settled />
-        <WordmarkBlock
-          before={before}
-          after={after}
-          purpleScale={1}
-          whiteScale={1}
-        />
-      </div>
-    );
-  }
 
   /* ── Animated ────────────────────────────────────────────────────── */
   return (
@@ -140,7 +136,6 @@ function WordmarkBlock({ before, after, purpleScale, whiteScale }) {
             width: `${PURPLE_SIZE_EM}em`,
             height: `${PURPLE_SIZE_EM}em`,
             transformOrigin: "center",
-            transformPerspective: 1200, // Matches Framer's perspective logic
             scale: purpleScale,
           }}
         />
@@ -155,7 +150,6 @@ function WordmarkBlock({ before, after, purpleScale, whiteScale }) {
             width: `${WHITE_SIZE_EM}em`,
             height: `${WHITE_SIZE_EM}em`,
             transformOrigin: "center",
-            transformPerspective: 1200, // Matches Framer's perspective logic
             scale: whiteScale,
           }}
         />
