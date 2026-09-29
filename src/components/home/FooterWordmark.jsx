@@ -1,221 +1,124 @@
-import { useRef } from "react";
-import {
-  motion,
-  useScroll,
-  useTransform,
-  useReducedMotion,
-} from "motion/react";
+import React, { useRef, useLayoutEffect } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 /**
- * FooterWordmark
+ * FooterWordmark (GSAP Version)
  *
- * Scroll-driven "reverse reveal" animation matching the 100xMedia Framer design.
+ * Scroll-driven "reverse reveal" animation.
  *
  * TRIGGER
- *   progress = 0  → card top edge hits the BOTTOM of the viewport
- *                   (offset "start end"). Circles are MASSIVE, covering the footer.
- *   progress = 1  → card top edge is 30% from the top of the viewport
- *                   (offset "start 30%"). Circles have shrunk to resting dot.
- *
- * TIMELINE (progress 0 → 1)
- *   0.0 → 0.9 : Circles shrink from peak size down to resting size using
- *               an exponential curve (matching the Framer physics).
- *   0.9 → 1.0 : Circles settled at resting dot size.
+ *   start = "top bottom" (card top edge hits the BOTTOM of the viewport)
+ *   end   = "bottom bottom" (card bottom edge hits the BOTTOM of the viewport)
  */
 
 /* ─── Resting dot geometry (em, relative to the h2 font-size) ───────── */
-const DOT_TOP_EM = -0.52;       
+const DOT_TOP_EM = -0.42;       
 const PURPLE_SIZE_EM = 0.22;    
 const WHITE_SIZE_EM = 0.13;     
 
 /* ─── Peak scale (progress = 0) ──────────────────────────────────────── */
 const PEAK_SCALE_PURPLE = 80;
-const PEAK_SCALE_WHITE = 27; // ~33% of purple's scale
-
-/* ─── Ornament reveal — staggered ───────────────────────────────────── */
-const ORN_A = { fade: [0.3, 0.6], rise: [0.3, 0.65] };
-const ORN_B = { fade: [0.4, 0.7], rise: [0.4, 0.75] };
-const ORN_C = { fade: [0.5, 0.8], rise: [0.5, 0.85] };
+const PEAK_SCALE_WHITE = 27;
 
 /* ─── White circle top: centered inside purple ──────────────────────── */
 const WHITE_TOP_EM = DOT_TOP_EM + (PURPLE_SIZE_EM - WHITE_SIZE_EM) / 2;
 
-/* ================================================================== */
-
 export default function FooterWordmark({ text = "Visorithm", splitAt = 5, cardRef }) {
-  /* splitAt = 5 → "Visor" | dotless-ı | "thm" */
   const before = text.slice(0, splitAt);
   const after  = text.slice(splitAt + 1);
 
   const localRef = useRef(null);
+  const purpleRef = useRef(null);
+  const whiteRef = useRef(null);
 
-  /* ── Scroll progress ─────────────────────────────────────────────── */
-  // Use "start end" (starts when top of footer enters view)
-  // to "end bottom" (finishes when bottom of footer hits bottom of screen)
-  const { scrollYProgress } = useScroll({
-    target: cardRef ?? localRef,
-    offset: ["start end", "end end"],
-  });
+  useLayoutEffect(() => {
+    // The target that triggers the scroll is the footer card
+    const target = cardRef && cardRef.current ? cardRef.current : localRef.current;
+    if (!target || !purpleRef.current || !whiteRef.current) return;
 
-  /* ── Scale MotionValues (Shrink from massive down to dot) ────────── */
-  // As user scrolls down (progress 0 -> 1), circles SHRINK from PEAK down to 1.
-  const purpleScale = useTransform(
-    scrollYProgress,
-    [0, 0.25, 0.5, 0.75, 1],
-    [
-      PEAK_SCALE_PURPLE,
-      PEAK_SCALE_PURPLE * Math.pow(1 / PEAK_SCALE_PURPLE, 0.25),
-      PEAK_SCALE_PURPLE * Math.pow(1 / PEAK_SCALE_PURPLE, 0.5),
-      PEAK_SCALE_PURPLE * Math.pow(1 / PEAK_SCALE_PURPLE, 0.75),
-      1
-    ]
-  );
+    // Use a small delay for ScrollTrigger refresh to ensure the page layout 
+    // has completely stabilized (fonts/images loaded) before calculating offsets.
+    const timeout = setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 100);
 
-  const whiteScale = useTransform(
-    scrollYProgress,
-    [0, 0.25, 0.5, 0.75, 1],
-    [
-      PEAK_SCALE_WHITE,
-      PEAK_SCALE_WHITE * Math.pow(1 / PEAK_SCALE_WHITE, 0.25),
-      PEAK_SCALE_WHITE * Math.pow(1 / PEAK_SCALE_WHITE, 0.5),
-      PEAK_SCALE_WHITE * Math.pow(1 / PEAK_SCALE_WHITE, 0.75),
-      1
-    ]
-  );
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: target,
+        start: "top bottom", // Top of footer enters bottom of viewport
+        end: "bottom bottom", // Bottom of footer hits bottom of viewport
+        scrub: 1, // Smooth scrubbing lag
+      },
+    });
 
-  /* ── Ornament MotionValues ───────────────────────────────────────── */
-  const fadeA = useTransform(scrollYProgress, ORN_A.fade, [0, 1]);
-  const riseA = useTransform(scrollYProgress, ORN_A.rise, [28, 0]);
-  const fadeB = useTransform(scrollYProgress, ORN_B.fade, [0, 1]);
-  const riseB = useTransform(scrollYProgress, ORN_B.rise, [36, 0]);
-  const fadeC = useTransform(scrollYProgress, ORN_C.fade, [0, 1]);
-  const riseC = useTransform(scrollYProgress, ORN_C.rise, [24, 0]);
+    // We start from massive and animate to scale 1.
+    // Using "expo.out" replicates the steep exponential decay of the original physics.
+    gsap.set(purpleRef.current, { scale: PEAK_SCALE_PURPLE });
+    gsap.set(whiteRef.current, { scale: PEAK_SCALE_WHITE });
 
-  /* ── Animated ────────────────────────────────────────────────────── */
+    tl.to(purpleRef.current, {
+      scale: 1,
+      ease: "expo.out",
+    }, 0)
+    .to(whiteRef.current, {
+      scale: 1,
+      ease: "expo.out",
+    }, 0);
+
+    return () => {
+      clearTimeout(timeout);
+      tl.kill();
+    };
+  }, [cardRef]);
+
   return (
     <div ref={localRef} className="relative z-10 select-none">
-      <Ornaments
-        fadeA={fadeA} riseA={riseA}
-        fadeB={fadeB} riseB={riseB}
-        fadeC={fadeC} riseC={riseC}
-      />
-      <WordmarkBlock
-        before={before}
-        after={after}
-        purpleScale={purpleScale}
-        whiteScale={whiteScale}
-      />
-    </div>
-  );
-}
+      <h2
+        className="relative z-0 m-0 text-center font-extrabold leading-[0.85] tracking-tight text-white drop-shadow-[0_4px_16px_rgba(11,17,32,0.8)]
+                   text-[16vw] sm:text-[13vw] lg:text-[10vw]"
+        aria-label={`${before}i${after}`}
+      >
+        {before}
 
-/* ================================================================== */
-/*  Wordmark + circles                                                 */
-/* ================================================================== */
-function WordmarkBlock({ before, after, purpleScale, whiteScale }) {
-  return (
-    <h2
-      className="relative z-0 m-0 text-center font-extrabold leading-[0.85] tracking-tight text-white drop-shadow-[0_4px_16px_rgba(11,17,32,0.8)]
-                 text-[16vw] sm:text-[13vw] lg:text-[10vw]"
-      aria-label={`${before}i${after}`}
-    >
-      {before}
+        {/* The dotless-ı span anchors both circles. */}
+        <span className="relative inline-block" aria-hidden="true">
+          {/* U+0131 dotless i — font never draws its own dot here */}
+          {"\u0131"}
 
-      {/* The dotless-ı span anchors both circles. */}
-      <span className="relative inline-block" aria-hidden="true">
-        {/* U+0131 dotless i — font never draws its own dot here */}
-        {"\u0131"}
-
-        {/* ── PURPLE circle ─────────────────────────────────────────
-            z-[-2]: behind the text.  */}
-        <motion.span
-          className="absolute inset-x-0 mx-auto rounded-full bg-gradient-to-br from-violet-400 to-purple-600"
-          style={{
-            zIndex: -2,
-            top: `${DOT_TOP_EM}em`,
-            width: `${PURPLE_SIZE_EM}em`,
-            height: `${PURPLE_SIZE_EM}em`,
-            transformOrigin: "center",
-            scale: purpleScale,
-          }}
-        />
-
-        {/* ── WHITE circle ──────────────────────────────────────────
-            z-[-1]: behind the text, in front of purple. */}
-        <motion.span
-          className="absolute inset-x-0 mx-auto rounded-full bg-white"
-          style={{
-            zIndex: -1,
-            top: `${WHITE_TOP_EM}em`,
-            width: `${WHITE_SIZE_EM}em`,
-            height: `${WHITE_SIZE_EM}em`,
-            transformOrigin: "center",
-            scale: whiteScale,
-          }}
-        />
-      </span>
-
-      {after}
-    </h2>
-  );
-}
-
-/* ================================================================== */
-/*  Ornaments row                                                      */
-/* ================================================================== */
-/**
- * Props (animated mode): fadeA/riseA, fadeB/riseB, fadeC/riseC — MotionValues.
- * Props (settled mode):  settled={true} — renders all ornaments fully visible.
- */
-function Ornaments({ settled, fadeA, riseA, fadeB, riseB, fadeC, riseC }) {
-  const aStyle = settled ? { opacity: 1 } : { opacity: fadeA, y: riseA };
-  const bStyle = settled ? { opacity: 1 } : { opacity: fadeB, y: riseB };
-  const cStyle = settled ? { opacity: 1 } : { opacity: fadeC, y: riseC };
-
-  return (
-    <div
-      aria-hidden="true"
-      className="pointer-events-none relative z-0 mx-auto flex h-[9vw] max-h-28 w-full max-w-3xl
-                 items-end justify-between px-[8%] sm:px-[12%]"
-    >
-      {/* A: sorting-bars motif */}
-      <motion.div className="relative flex items-end gap-1" style={aStyle}>
-        <Glow />
-        {[0.4, 0.7, 1, 0.55].map((h, i) => (
+          {/* ── PURPLE circle ───────────────────────────────────────── */}
           <span
-            key={i}
-            className="w-2 rounded-t-sm bg-slate-500/50 sm:w-2.5"
-            style={{ height: `${h * 2.2}rem` }}
+            ref={purpleRef}
+            className="absolute inset-x-0 mx-auto rounded-full bg-gradient-to-br from-violet-400 to-purple-600"
+            style={{
+              zIndex: -2,
+              top: `${DOT_TOP_EM}em`,
+              width: `${PURPLE_SIZE_EM}em`,
+              height: `${PURPLE_SIZE_EM}em`,
+              transformOrigin: "center",
+            }}
           />
-        ))}
-      </motion.div>
 
-      {/* B: node-fan / arc motif */}
-      <motion.div className="relative" style={bStyle}>
-        <Glow />
-        <div className="flex flex-col items-center gap-0.5">
-          {[0.9, 0.65, 0.4].map((s, i) => (
-            <span
-              key={i}
-              className="rounded-t-full bg-slate-500/40"
-              style={{ width: `${s * 3.6}rem`, height: `${s * 1.8}rem` }}
-            />
-          ))}
-        </div>
-      </motion.div>
+          {/* ── WHITE circle ────────────────────────────────────────── */}
+          <span
+            ref={whiteRef}
+            className="absolute inset-x-0 mx-auto rounded-full bg-white"
+            style={{
+              zIndex: -1,
+              top: `${WHITE_TOP_EM}em`,
+              width: `${WHITE_SIZE_EM}em`,
+              height: `${WHITE_SIZE_EM}em`,
+              transformOrigin: "center",
+            }}
+          />
+        </span>
 
-      {/* C: linked-dots motif */}
-      <motion.div className="relative flex flex-col items-center gap-1.5" style={cStyle}>
-        <Glow />
-        <span className="h-3 w-3 rounded-full bg-slate-500/50 sm:h-3.5 sm:w-3.5" />
-        <span className="h-2.5 w-2.5 rounded-full bg-slate-500/35 sm:h-3 sm:w-3" />
-      </motion.div>
+        {after}
+      </h2>
     </div>
-  );
-}
-
-function Glow() {
-  return (
-    <span className="pointer-events-none absolute -inset-4 -z-10 rounded-full bg-blue-500/10 blur-xl" />
   );
 }
