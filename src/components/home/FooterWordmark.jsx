@@ -1,206 +1,191 @@
-import { useRef, useState } from "react";
-import { motion, useScroll, useTransform, useReducedMotion, useMotionValueEvent } from "motion/react";
+import { useRef } from "react";
+import {
+  motion,
+  useScroll,
+  useTransform,
+  useReducedMotion,
+} from "motion/react";
 
 /**
  * FooterWordmark
  *
- * REBUILT from a frame-by-frame PDF breakdown + a verbal walkthrough of the
- * reference site (percent-by-percent, e.g. "at 10% scroll the purple circle
- * has already covered the whole navbar row; by 40% it's near its biggest;
- * from there it recedes, and by ~90-100% it's shrunk down to a small dot
- * sitting on the wordmark's i, with a white circle still visible inside it").
- * Earlier version of this file only handled a simple "big -> small" shrink
- * confined to the area right above the wordmark -- it never grew to cover
- * the section, which is the whole point of the effect. This version does:
+ * Scroll-driven "reverse reveal" animation matching the 100xMedia Framer design.
  *
- *   1. GROW: from progress 0, two circles (purple behind, white in front,
- *      both anchored at the wordmark's i-dot) swell up FAST -- essentially
- *      full-grown by ~10-12% of scroll -- large enough to cover the entire
- *      footer card (nav row included). The card itself (see `cardRef`,
- *      passed from Footer.jsx) clips them with `overflow-hidden`, which is
- *      what makes the grown shape read as "filling the card, corners and
- *      all" without any separate corner-matching code.
- *   2. HOLD/EASE: they stay large through ~12-35%, purple always a little
- *      ahead of white (matches "purple grows a bit faster").
- *   3. SHRINK: from ~35% to ~92%, both recede back down to their resting
- *      size -- a normal-sized dot -- progressively revealing the nav row,
- *      the wordmark, and the copyright line underneath as they go.
- *   4. REST: from ~92-100%, settled: a purple ring with a visible white
- *      center sitting on the i -- NOT a solid purple dot. White is always
- *      smaller than purple and always on top (z-index: white > purple > the
- *      rest of the card), at every point in the animation, not just at rest.
+ * TRIGGER
+ *   progress = 0  → card top edge hits the BOTTOM of the viewport
+ *                   (offset "start end"). Circles are MASSIVE, covering the footer.
+ *   progress = 1  → card top edge is 30% from the top of the viewport
+ *                   (offset "start 30%"). Circles have shrunk to resting dot.
  *
- * Because this is one continuous `scrollYProgress`-driven curve (not a
- * "play once" animation), scrolling back up simply retraces the same curve
- * in reverse -- it re-grows, then shrinks back to the dot again.
- *
- * `cardRef`: a ref to the OUTER card element (created in Footer.jsx). Used
- * as the `useScroll` target, so the timeline is driven by how far the card
- * itself has scrolled into view.
- *
- * TUNING NOTE: DOT_TOP_EM positions the resting dot relative to the dotless
- * "ı" -- a reasonable default for most sans-serif fonts, but check it
- * against your real font. PEAK_SCALE is deliberately generous (60x) so the
- * circles reliably cover the card regardless of its exact pixel size; if
- * your card is unusually large/small, adjust it until the "grown" frame
- * fully fills the card with no background peeking through at the far
- * corner, and no wasted excess beyond that.
+ * TIMELINE (progress 0 → 1)
+ *   0.0 → 0.9 : Circles shrink from peak size down to resting size using
+ *               an exponential curve (matching the Framer physics).
+ *   0.9 → 1.0 : Circles settled at resting dot size.
  */
 
-const DOT_TOP_EM = -0.55; // vertical position of the resting dot, relative to the dotless-i's own top
-const PURPLE_SIZE_EM = 0.22; // purple circle's resting diameter, in em
-const WHITE_SIZE_EM = 0.13; // white circle's resting diameter, in em (always smaller than purple)
+/* ─── Resting dot geometry (em, relative to the h2 font-size) ───────── */
+const DOT_TOP_EM = -0.52;       
+const PURPLE_SIZE_EM = 0.22;    
+const WHITE_SIZE_EM = 0.13;     
 
-const PEAK_SCALE = 60; // how many times bigger than resting size, at the biggest point of the "grow"
-const WHITE_PEAK_RATIO = 0.85; // white's peak scale, as a fraction of purple's (purple grows a bit bigger/faster)
+/* ─── Peak scale (progress = 0) ──────────────────────────────────────── */
+const PEAK_SCALE_PURPLE = 80;
+const PEAK_SCALE_WHITE = 27; // ~33% of purple's scale
 
-// Shared progress keyframes: 0 (start) -> fast grow -> near-peak hold -> shrink -> settle.
-const PROGRESS_STOPS = [0, 0.12, 0.35, 0.92, 1];
-const PURPLE_SCALE_STOPS = [0.4, PEAK_SCALE, PEAK_SCALE * 0.9, 1, 1];
-const WHITE_SCALE_STOPS = [
-  0.4,
-  PEAK_SCALE * WHITE_PEAK_RATIO,
-  PEAK_SCALE * WHITE_PEAK_RATIO * 0.9,
-  1,
-  1,
-];
+/* ─── Ornament reveal — staggered ───────────────────────────────────── */
+const ORN_A = { fade: [0.3, 0.6], rise: [0.3, 0.65] };
+const ORN_B = { fade: [0.4, 0.7], rise: [0.4, 0.75] };
+const ORN_C = { fade: [0.5, 0.8], rise: [0.5, 0.85] };
+
+/* ─── White circle top: centered inside purple ──────────────────────── */
+const WHITE_TOP_EM = DOT_TOP_EM + (PURPLE_SIZE_EM - WHITE_SIZE_EM) / 2;
+
+/* ================================================================== */
 
 export default function FooterWordmark({ text = "Visorithm", splitAt = 5, cardRef }) {
-  // splitAt=5 -> "Visor" | "i" | "thm"  (the i between r and t, per the brief)
+  /* splitAt = 5 → "Visor" | dotless-ı | "thm" */
   const before = text.slice(0, splitAt);
-  const after = text.slice(splitAt + 1);
+  const after  = text.slice(splitAt + 1);
 
-  const localRef = useRef(null);
-  const reduceMotion = useReducedMotion();
+  const localRef    = useRef(null);
+  const shouldReduce = useReducedMotion();
 
-  // Progress 0 -> 1 as the CARD scrolls from "just entering the bottom of
-  // the viewport" to "sitting comfortably in view". Scrubs both ways.
+  /* ── Scroll progress ─────────────────────────────────────────────── */
+  // Use "start end" (starts when top of footer enters view)
+  // to "end end" (finishes when bottom of footer hits bottom of screen)
+  // This ensures the animation completes fully even on large monitors!
   const { scrollYProgress } = useScroll({
     target: cardRef ?? localRef,
-    offset: ["start 90%", "start 25%"],
+    offset: ["start end", "end end"],
   });
 
-  // DEBUG: live readout of scrollYProgress — REMOVE after timing check.
-  const [debugProgress, setDebugProgress] = useState(0);
-  useMotionValueEvent(scrollYProgress, "change", (v) => setDebugProgress(v));
+  /* ── Scale MotionValues (Shrink from massive down to dot) ────────── */
+  // As user scrolls down (progress 0 -> 1), circles SHRINK from PEAK down to 1.
+  // We use exponential decay for a physically smooth shrinking feel.
+  const purpleScale = useTransform(scrollYProgress, (p) => {
+    const progress = Math.max(0, Math.min(1, p));
+    return PEAK_SCALE_PURPLE * Math.pow(1 / PEAK_SCALE_PURPLE, progress);
+  });
 
-  const purpleScale = useTransform(scrollYProgress, PROGRESS_STOPS, PURPLE_SCALE_STOPS);
-  const whiteScale = useTransform(scrollYProgress, PROGRESS_STOPS, WHITE_SCALE_STOPS);
-  const purpleTransform = useTransform(purpleScale, (s) => `perspective(1200px) scale(${s})`);
-  const whiteTransform = useTransform(whiteScale, (s) => `perspective(1200px) scale(${s})`);
+  const whiteScale = useTransform(scrollYProgress, (p) => {
+    const progress = Math.max(0, Math.min(1, p));
+    return PEAK_SCALE_WHITE * Math.pow(1 / PEAK_SCALE_WHITE, progress);
+  });
 
-  // Ornaments: staggered ranges so they arrive one after another, only once
-  // the circles have mostly receded (they'd be hidden underneath early on).
-  const riseA = useTransform(scrollYProgress, [0.4, 0.75], [26, 0]);
-  const fadeA = useTransform(scrollYProgress, [0.4, 0.68], [0, 1]);
-  const riseB = useTransform(scrollYProgress, [0.5, 0.85], [34, 0]);
-  const fadeB = useTransform(scrollYProgress, [0.5, 0.78], [0, 1]);
-  const riseC = useTransform(scrollYProgress, [0.6, 0.95], [22, 0]);
-  const fadeC = useTransform(scrollYProgress, [0.6, 0.88], [0, 1]);
+  /* ── Ornament MotionValues ───────────────────────────────────────── */
+  const fadeA = useTransform(scrollYProgress, ORN_A.fade, [0, 1]);
+  const riseA = useTransform(scrollYProgress, ORN_A.rise, [28, 0]);
+  const fadeB = useTransform(scrollYProgress, ORN_B.fade, [0, 1]);
+  const riseB = useTransform(scrollYProgress, ORN_B.rise, [36, 0]);
+  const fadeC = useTransform(scrollYProgress, ORN_C.fade, [0, 1]);
+  const riseC = useTransform(scrollYProgress, ORN_C.rise, [24, 0]);
 
-  if (reduceMotion) {
-    // Static, fully-settled state -- no scroll-linked motion at all.
+  /* ── Reduced-motion: fully settled, static ───────────────────────── */
+  if (shouldReduce) {
     return (
       <div ref={localRef} className="relative z-10 select-none">
-        <Ornaments style={{ opacity: 1 }} />
-        <Wordmark
+        <Ornaments settled />
+        <WordmarkBlock
           before={before}
           after={after}
-          purpleStyle={{ transform: "scale(1)" }}
-          whiteStyle={{ transform: "scale(1)" }}
+          purpleScale={1}
+          whiteScale={1}
         />
       </div>
     );
   }
 
+  /* ── Animated ────────────────────────────────────────────────────── */
   return (
-    <>
-    {/* DEBUG overlay — REMOVE after timing check */}
-    <div style={{
-      position: "fixed", bottom: 12, left: 12, zIndex: 99999,
-      background: "rgba(0,0,0,0.75)", color: "#0f0",
-      fontFamily: "monospace", fontSize: 11, padding: "4px 8px",
-      borderRadius: 4, pointerEvents: "none", lineHeight: 1.4,
-    }}>
-      footer scrollYProgress: {debugProgress.toFixed(4)}
-    </div>
     <div ref={localRef} className="relative z-10 select-none">
       <Ornaments
-        aStyle={{ y: riseA, opacity: fadeA }}
-        bStyle={{ y: riseB, opacity: fadeB }}
-        cStyle={{ y: riseC, opacity: fadeC }}
+        fadeA={fadeA} riseA={riseA}
+        fadeB={fadeB} riseB={riseB}
+        fadeC={fadeC} riseC={riseC}
       />
-      <Wordmark
+      <WordmarkBlock
         before={before}
         after={after}
-        purpleStyle={{ transform: purpleTransform }}
-        whiteStyle={{ transform: whiteTransform }}
+        purpleScale={purpleScale}
+        whiteScale={whiteScale}
       />
     </div>
-    </>
   );
 }
 
-/* ------------------------------------------------------------------ */
-/*  The wordmark itself, plus the two reveal circles                   */
-/* ------------------------------------------------------------------ */
-function Wordmark({ before, after, purpleStyle, whiteStyle }) {
+/* ================================================================== */
+/*  Wordmark + circles                                                 */
+/* ================================================================== */
+function WordmarkBlock({ before, after, purpleScale, whiteScale }) {
   return (
     <h2
-      className="relative z-0 m-0 text-center font-extrabold leading-[0.85] tracking-tight text-white
+      className="relative z-0 m-0 text-center font-extrabold leading-[0.85] tracking-tight text-white drop-shadow-[0_4px_16px_rgba(11,17,32,0.8)]
                  text-[16vw] sm:text-[13vw] lg:text-[10vw]"
       aria-label={`${before}i${after}`}
     >
       {before}
+
+      {/* The dotless-ı span anchors both circles. */}
       <span className="relative inline-block" aria-hidden="true">
-        {/* dotless i -- the real glyph never draws its own dot */}
+        {/* U+0131 dotless i — font never draws its own dot here */}
         {"\u0131"}
 
-        {/* PURPLE: bigger of the two, sits behind White, lower z-index. */}
+        {/* ── PURPLE circle ─────────────────────────────────────────
+            z-[-2]: behind the text.  */}
         <motion.span
-          className="absolute inset-x-0 z-30 mx-auto rounded-full bg-gradient-to-br from-violet-400 to-purple-600"
+          className="absolute inset-x-0 mx-auto rounded-full bg-gradient-to-br from-violet-400 to-purple-600"
           style={{
+            zIndex: -2,
             top: `${DOT_TOP_EM}em`,
             width: `${PURPLE_SIZE_EM}em`,
             height: `${PURPLE_SIZE_EM}em`,
             transformOrigin: "center",
-            ...purpleStyle,
+            transformPerspective: 1200, // Matches Framer's perspective logic
+            scale: purpleScale,
           }}
         />
 
-        {/* WHITE: smaller, always on top (highest z-index of the two, per
-            the reference: white > purple > everything else on the card). */}
+        {/* ── WHITE circle ──────────────────────────────────────────
+            z-[-1]: behind the text, in front of purple. */}
         <motion.span
-          className="absolute inset-x-0 z-40 mx-auto rounded-full bg-white"
+          className="absolute inset-x-0 mx-auto rounded-full bg-white"
           style={{
-            top: `${DOT_TOP_EM + (PURPLE_SIZE_EM - WHITE_SIZE_EM) / 2}em`,
+            zIndex: -1,
+            top: `${WHITE_TOP_EM}em`,
             width: `${WHITE_SIZE_EM}em`,
             height: `${WHITE_SIZE_EM}em`,
             transformOrigin: "center",
-            ...whiteStyle,
+            transformPerspective: 1200, // Matches Framer's perspective logic
+            scale: whiteScale,
           }}
         />
       </span>
+
       {after}
     </h2>
   );
 }
 
-/* ------------------------------------------------------------------ */
-/*  Three small "glass" ornament clusters above the wordmark.          */
-/*  Purely decorative (aria-hidden). Swap the shapes for whatever fits */
-/*  the brand -- these lean on the same DSA motifs as the rest of the  */
-/*  site (bars / node-fan / linked dots).                              */
-/* ------------------------------------------------------------------ */
-function Ornaments({ aStyle, bStyle, cStyle, style }) {
+/* ================================================================== */
+/*  Ornaments row                                                      */
+/* ================================================================== */
+/**
+ * Props (animated mode): fadeA/riseA, fadeB/riseB, fadeC/riseC — MotionValues.
+ * Props (settled mode):  settled={true} — renders all ornaments fully visible.
+ */
+function Ornaments({ settled, fadeA, riseA, fadeB, riseB, fadeC, riseC }) {
+  const aStyle = settled ? { opacity: 1 } : { opacity: fadeA, y: riseA };
+  const bStyle = settled ? { opacity: 1 } : { opacity: fadeB, y: riseB };
+  const cStyle = settled ? { opacity: 1 } : { opacity: fadeC, y: riseC };
+
   return (
     <div
       aria-hidden="true"
       className="pointer-events-none relative z-0 mx-auto flex h-[9vw] max-h-28 w-full max-w-3xl
                  items-end justify-between px-[8%] sm:px-[12%]"
     >
-      {/* A: mini sorting-bars motif */}
-      <motion.div className="relative flex items-end gap-1" style={aStyle ?? style}>
+      {/* A: sorting-bars motif */}
+      <motion.div className="relative flex items-end gap-1" style={aStyle}>
         <Glow />
         {[0.4, 0.7, 1, 0.55].map((h, i) => (
           <span
@@ -211,8 +196,8 @@ function Ornaments({ aStyle, bStyle, cStyle, style }) {
         ))}
       </motion.div>
 
-      {/* B: node-fan motif (three stacked arcs, evokes a tree/graph fan) */}
-      <motion.div className="relative" style={bStyle ?? style}>
+      {/* B: node-fan / arc motif */}
+      <motion.div className="relative" style={bStyle}>
         <Glow />
         <div className="flex flex-col items-center gap-0.5">
           {[0.9, 0.65, 0.4].map((s, i) => (
@@ -226,7 +211,7 @@ function Ornaments({ aStyle, bStyle, cStyle, style }) {
       </motion.div>
 
       {/* C: linked-dots motif */}
-      <motion.div className="relative flex flex-col items-center gap-1.5" style={cStyle ?? style}>
+      <motion.div className="relative flex flex-col items-center gap-1.5" style={cStyle}>
         <Glow />
         <span className="h-3 w-3 rounded-full bg-slate-500/50 sm:h-3.5 sm:w-3.5" />
         <span className="h-2.5 w-2.5 rounded-full bg-slate-500/35 sm:h-3 sm:w-3" />
@@ -237,8 +222,6 @@ function Ornaments({ aStyle, bStyle, cStyle, style }) {
 
 function Glow() {
   return (
-    <span
-      className="pointer-events-none absolute -inset-4 -z-10 rounded-full bg-blue-500/10 blur-xl"
-    />
+    <span className="pointer-events-none absolute -inset-4 -z-10 rounded-full bg-blue-500/10 blur-xl" />
   );
 }
