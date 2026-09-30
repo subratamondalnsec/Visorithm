@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import FooterWordmark from "./FooterWordmark";
+// import VisorithmDepthWordmark from "./VisorithmDepthWordmark";
 
 /**
  * Footer
@@ -32,7 +33,7 @@ export default function Footer({ categories = [] }) {
       >
         <div className="relative z-0 mx-auto max-w-6xl px-6 pb-4 pt-14 sm:px-8">
           {/* ---- nav / contact block ---- */}
-          <div className="flex flex-col gap-10 border-b border-slate-800 pb-12 sm:flex-row sm:justify-between">
+          <div className="flex flex-col gap-10  pb-12 sm:flex-row sm:justify-between">
             <div className="max-w-sm">
               <span className="text-lg font-semibold tracking-tight text-white">
                 Visorithm
@@ -73,6 +74,7 @@ export default function Footer({ categories = [] }) {
               this whole card -- nav row included -- while grown) ---- */}
           <div className="pt-10">
             <FooterWordmark text="Visorithm" splitAt={5} cardRef={cardRef} />
+            {/* <VisorithmDepthWordmark /> */}
           </div>
 
           {/* ---- copyright ---- */}
