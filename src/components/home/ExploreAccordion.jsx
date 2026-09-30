@@ -7,37 +7,28 @@ import { ALGORITHM_ICONS } from "./algorithmIcons";
 /**
  * ExploreAccordion
  * ------------------------------------------------------------------
- * v3 - two more rounds of fixes on top of v2:
+ * v4 - on top of v3's fixes (no per-algorithm note, overflow-hidden
+ * so a scrollbar can never appear, calc()-based sizing that can't
+ * overflow its container, hover-lock against border flicker):
  *
- *  1. The per-algorithm description ("note") is gone, everywhere -
- *     desktop, tablet, and phone. It was the actual root cause of
- *     the scrollbar: four or five two-line rows plus a description
- *     plus a header no longer fit inside a fixed-height panel, so
- *     the list's overflow-y-auto kicked in and drew a scrollbar
- *     (sometimes a visually-confusing horizontal-looking one too,
- *     once the vertical scrollbar's own width squeezed a row enough
- *     to wrap oddly). Rather than trying to detect overflow and
- *     react to it at runtime, the fix is simpler and matches what
- *     was asked for directly: don't render that line at all, on any
- *     tier. Each row is now a single line (icon + title + badge,
- *     arrow on the right), which comfortably fits every category
- *     without scrolling.
- *  2. Because a scrollbar must now never be able to appear even if
- *     some future edit adds more items than fit, the row list uses
- *     overflow-hidden instead of overflow-y-auto - it can clip in a
- *     worst case, but it will never draw a scrollbar.
- *  3. Every row gets its own distinct icon from ALGORITHM_ICONS
- *     (keyed by the same algorithm id already used for its route),
- *     instead of no icon at all. Category icons are now real
- *     components too (passed in via the `icons` prop), not unicode
- *     glyphs, so they render crisply at any size.
- *  4. Row padding increased now that each row is a single line, so
- *     the list doesn't look cramped with all the extra vertical
- *     room the removed note freed up.
- *
- * (v2's fixes - calc()-based flex-basis sizing so the rail can never
- * overflow its container, and the hover-lock that stops two columns
- * flickering at their shared border - are unchanged.)
+ *  1. The collapsed column's label used to be a horizontal line of
+ *     text truncated with an ellipsis ("Dyna...") because a ~64-110px
+ *     -wide column has nowhere near enough room for "Dynamic
+ *     Programming" written left-to-right. It's rotated now (CSS
+ *     writing-mode, not a transform hack) so the text runs along the
+ *     column's HEIGHT instead of its width - 480-560px is plenty for
+ *     every category name in full, matching how the reference site's
+ *     own collapsed columns behave.
+ *  2. Font weight bumped to extrabold on every category name (both
+ *     collapsed and open) for a more solid, deliberate look instead
+ *     of the thinner semibold before.
+ *  3. Each row's arrow now lives in its own circular chip, sits with
+ *     more resting distance from the title, and travels further on
+ *     hover with a back-out easing curve that overshoots slightly -
+ *     a CSS approximation of spring/bounce physics - instead of the
+ *     small 2px nudge before. Row corners are rounder (2xl) and the
+ *     whole row lifts and scales up a touch on hover for a punchier,
+ *     more "alive" feel.
  *
  * Responsive tiers:
  *  - < md (phone): vertical tap accordion.
@@ -47,9 +38,7 @@ import { ALGORITHM_ICONS } from "./algorithmIcons";
  *    category description shown.
  *
  * Props
- *   categories  - the existing `categories` array (unchanged shape;
- *                 each item's 4th element, the description, is simply
- *                 no longer read)
+ *   categories  - the existing `categories` array (unchanged shape)
  *   icons       - category.name -> a component (e.g. a lucide icon),
  *                 NOT a string
  *   defaultOpen - category.name to start open (defaults to the first)
@@ -58,6 +47,9 @@ import { ALGORITHM_ICONS } from "./algorithmIcons";
 const TRANSITION_MS = 500;
 const TRANSITION_EASE = "cubic-bezier(0.33, 1, 0.68, 1)";
 const TRANSITION_LOCK_MS = TRANSITION_MS + 60;
+// A "back out" curve - eases in normally, then overshoots past the
+// target and settles back - the standard CSS stand-in for a spring.
+const SPRING_EASE = "cubic-bezier(0.34, 1.56, 0.64, 1)";
 
 export default function ExploreAccordion({ categories, icons, defaultOpen }) {
   const [openIndex, setOpenIndex] = useState(() => {
@@ -109,11 +101,6 @@ export default function ExploreAccordion({ categories, icons, defaultOpen }) {
             calc(100% - (var(--count) - 1) * var(--closed) - (var(--count) - 1) * var(--gap))
           );
         }
-        .explore-rail > .explore-col .explore-panel {
-          width: max(
-            var(--open-min),
-            calc(100% - (var(--count) - 1) * var(--closed) - (var(--count) - 1) * var(--gap))
-          );
         }
         /* Tablet tier only: hide the category description so the
            trimmed panel stays short. Scoped to the rail, so the
@@ -122,6 +109,14 @@ export default function ExploreAccordion({ categories, icons, defaultOpen }) {
           .explore-rail .explore-note {
             display: none;
           }
+        }
+        /* Vertical label for collapsed columns - runs bottom-to-top,
+           along the column's height instead of its width, so long
+           names never need truncating. */
+        .explore-vlabel {
+          writing-mode: vertical-rl;
+          transform: rotate(180deg);
+          white-space: nowrap;
         }
       `}</style>
 
@@ -134,7 +129,6 @@ export default function ExploreAccordion({ categories, icons, defaultOpen }) {
           <AccordionColumn
             key={category.name}
             category={category}
-            Icon={icons[category.name]}
             index={i}
             isOpen={openIndex === i}
             onOpen={() => handleOpen(i)}
@@ -145,11 +139,11 @@ export default function ExploreAccordion({ categories, icons, defaultOpen }) {
 
       {/* ---------- PHONE: vertical tap accordion ---------- */}
       <div className="divide-y divide-slate-700/60 overflow-hidden rounded-3xl border border-slate-700/60 bg-[#0B1220] md:hidden">
+        
         {categories.map((category, i) => (
           <AccordionRow
             key={category.name}
             category={category}
-            Icon={icons[category.name]}
             index={i}
             isOpen={openIndex === i}
             onToggle={() => setOpenIndex(openIndex === i ? -1 : i)}
@@ -164,7 +158,7 @@ export default function ExploreAccordion({ categories, icons, defaultOpen }) {
 /* ------------------------------------------------------------------ */
 /*  TABLET + DESKTOP COLUMN                                            */
 /* ------------------------------------------------------------------ */
-function AccordionColumn({ category, Icon, index, isOpen, onOpen, reduceMotion }) {
+function AccordionColumn({ category, index, isOpen, onOpen, reduceMotion }) {
   return (
     <div
       onMouseEnter={onOpen}
@@ -178,14 +172,27 @@ function AccordionColumn({ category, Icon, index, isOpen, onOpen, reduceMotion }
           : "cursor-pointer border-slate-700/60 bg-[#0F1B2E] hover:bg-[#132238]"
       }`}
     >
-      {/* collapsed label - centered + stacked at tablet width, an
-          inline row at lg+. Only rendered while closed. */}
-      {!isOpen && (
-        <div className="flex h-full flex-col items-center justify-center gap-2 px-3 text-center text-sm font-semibold tracking-tight text-slate-200 lg:flex-row lg:justify-start lg:gap-2 lg:px-5 lg:pt-6 lg:text-left">
-          <Icon className="h-5 w-5 shrink-0 text-blue-300 lg:h-[18px] lg:w-[18px]" strokeWidth={2} />
-          <span className="max-w-full truncate">{category.name}</span>
-        </div>
-      )}
+      {/* collapsed label - anchored to the bottom with absolute positioning to prevent layout shifts during flex-basis animation. */}
+      <AnimatePresence>
+        {!isOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: reduceMotion ? 0 : 0.2 }}
+            className="absolute inset-0 flex flex-col items-center justify-end pb-22 px-2"
+          >
+            <div className="explore-vlabel flex items-center gap-22">
+              <span className="font-mono text-lg lg:text-2xl font-bold text-slate-500 slashed-zero">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <span className="text-2xl lg:text-[1.75rem] font-black tracking-tight text-slate-100">
+                {category.name}
+              </span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* expanded content - width pinned to the exact calc() value the
           column animates to, so it never reflows mid-transition */}
@@ -200,17 +207,17 @@ function AccordionColumn({ category, Icon, index, isOpen, onOpen, reduceMotion }
               ease: "easeOut",
               delay: reduceMotion ? 0 : 0.15,
             }}
-            className="explore-panel flex h-full flex-none flex-col px-5 pt-6 sm:px-8"
+            className="explore-panel flex h-full w-full flex-col px-5 pt-8 sm:px-8"
           >
-            <div className="flex flex-col items-center gap-2 text-center lg:flex-row lg:items-center lg:gap-2.5 lg:text-left">
-              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-blue-400/25 bg-blue-500/10 text-blue-300">
-                <Icon className="h-[18px] w-[18px]" strokeWidth={2} />
+            <div className="flex items-start gap-3 lg:gap-4">
+              <span className="mt-2.5 font-mono text-xs font-bold text-slate-400/80 slashed-zero lg:mt-3.5 lg:text-sm">
+                {String(index + 1).padStart(2, "0")}
               </span>
               <div>
-                <p className="text-lg font-semibold tracking-tight text-white">
+                <p className="text-3xl sm:text-4xl lg:text-[2.75rem] font-black tracking-tight text-white leading-[1.1]">
                   {category.name}
                 </p>
-                <p className="text-xs text-slate-400">
+                <p className="text-sm font-medium text-slate-400 mt-2">
                   {category.items.length} algorithms
                 </p>
               </div>
@@ -218,14 +225,13 @@ function AccordionColumn({ category, Icon, index, isOpen, onOpen, reduceMotion }
 
             {/* description - desktop only; hidden at tablet width via
                 the .explore-note media query above */}
-            <p className="explore-note mt-3 max-w-md text-sm leading-6 text-slate-300">
+            <p className="explore-note mt-5 text-sm leading-6 text-slate-300">
               {category.description}
             </p>
 
             {/* overflow-hidden (not auto) - a scrollbar must never be
-                able to appear here, even in a worst case; without the
-                note each category now fits comfortably regardless */}
-            <div className="mt-5 flex-1 overflow-hidden">
+                able to appear here, even in a worst case */}
+            <div className="mt-6 flex-1 overflow-hidden">
               {category.items.map(([id, title, difficulty]) => (
                 <AlgorithmRow
                   key={id}
@@ -239,28 +245,25 @@ function AccordionColumn({ category, Icon, index, isOpen, onOpen, reduceMotion }
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* index number, bottom-left, present in both states */}
-      <span className="mt-auto px-5 pb-5 text-center font-mono text-xs text-slate-500 lg:text-left">
-        {String(index + 1).padStart(2, "0")}
-      </span>
     </div>
   );
 }
 
 /* ------------------------------------------------------------------ */
 /*  ONE ALGORITHM ROW - shared by the desktop/tablet panel and the     */
-/*  phone accordion. Single line now: icon, title, difficulty badge,   */
-/*  and a diagonal arrow that snaps level and lifts on hover.          */
+/*  phone accordion. The arrow sits in its own chip with real         */
+/*  breathing room from the title, and springs further out on hover   */
+/*  via a back-out easing curve instead of a small linear nudge.      */
 /* ------------------------------------------------------------------ */
 function AlgorithmRow({ to, icon: Icon, title, difficulty }) {
   return (
     <Link
       to={to}
-      className="group/row -mx-3 flex items-center justify-between gap-3 rounded-xl border-b border-white/10 px-3 py-4 transition-colors duration-300 last:border-b-0 hover:bg-white/[0.04]"
+      className="group/row -mx-3 flex items-center justify-between gap-4 rounded-2xl border-b border-white/10 px-3 py-4 transition-[background-color,transform] duration-300 last:border-b-0 hover:bg-white/[0.05] hover:scale-[1.01]"
+      style={{ transitionTimingFunction: SPRING_EASE }}
     >
-      <span className="flex min-w-0 items-center gap-3 transition-transform duration-300 group-hover/row:-translate-y-0.5">
-        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-white/5 text-slate-400 transition-colors duration-300 group-hover/row:bg-blue-400/10 group-hover/row:text-blue-300">
+      <span className="flex min-w-0 items-center gap-3">
+        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-white/5 text-slate-400 transition-colors duration-300 group-hover/row:bg-blue-400/10 group-hover/row:text-blue-300">
           <Icon className="h-4 w-4" strokeWidth={2} />
         </span>
         <span className="truncate font-medium text-slate-200 transition-colors duration-300 group-hover/row:text-white">
@@ -279,11 +282,17 @@ function AlgorithmRow({ to, icon: Icon, title, difficulty }) {
         </span>
       </span>
 
-      <ArrowUpRight
-        size={16}
-        strokeWidth={2.2}
-        className="shrink-0 text-slate-500 transition-all duration-300 group-hover/row:translate-y-[-2px] group-hover/row:rotate-45 group-hover/row:text-blue-300"
-      />
+      {/* arrow chip - deliberately spaced away from the title (not
+          flush against it), and on hover it springs further right
+          and rotates level, overshooting slightly before settling */}
+      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white/5 text-slate-500 transition-colors duration-300 group-hover/row:bg-blue-400/15 group-hover/row:text-blue-300">
+        <ArrowUpRight
+          size={17}
+          strokeWidth={2.4}
+          className="transition-transform duration-500 group-hover/row:translate-x-[3px] group-hover/row:rotate-45"
+          style={{ transitionTimingFunction: SPRING_EASE }}
+        />
+      </span>
     </Link>
   );
 }
@@ -291,7 +300,7 @@ function AlgorithmRow({ to, icon: Icon, title, difficulty }) {
 /* ------------------------------------------------------------------ */
 /*  PHONE ROW - "01  Category Name  ⌄", tap to open                    */
 /* ------------------------------------------------------------------ */
-function AccordionRow({ category, Icon, index, isOpen, onToggle, reduceMotion }) {
+function AccordionRow({ category, index, isOpen, onToggle, reduceMotion }) {
   const panelId = useId();
   return (
     <div className="bg-[#0F1B2E]">
@@ -300,18 +309,17 @@ function AccordionRow({ category, Icon, index, isOpen, onToggle, reduceMotion })
         onClick={onToggle}
         aria-expanded={isOpen}
         aria-controls={panelId}
-        className="flex w-full items-center gap-3 px-5 py-4 text-left"
+        className="flex w-full items-center gap-4 px-5 py-5 text-left"
       >
-        <span className="font-mono text-xs text-slate-500">
+        <span className="font-mono text-sm font-bold text-slate-500 slashed-zero">
           {String(index + 1).padStart(2, "0")}
         </span>
-        <Icon className="h-[18px] w-[18px] text-blue-300" strokeWidth={2} />
-        <span className="flex-1 text-base font-semibold text-slate-100">
+        <span className="flex-1 text-xl sm:text-2xl font-black tracking-tight text-slate-100">
           {category.name}
         </span>
         <ChevronDown
-          size={18}
-          className={`text-blue-300 transition-transform duration-300 ${
+          size={20}
+          className={`text-slate-400 transition-transform duration-300 ${
             isOpen ? "rotate-180" : ""
           }`}
         />

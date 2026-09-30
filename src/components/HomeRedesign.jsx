@@ -69,6 +69,90 @@ const categories = [
     ],
   },
   {
+    name: "Searching",
+    path: "/searching/:algorithm",
+    description:
+      "Find values efficiently across sorted and unsorted collections.",
+    items: [
+      [
+        "linear",
+        "Linear Search",
+        "Easy",
+        "Check each value until a match is found.",
+      ],
+      [
+        "binary",
+        "Binary Search",
+        "Easy",
+        "Halve a sorted search space at every step.",
+      ],
+      [
+        "jump",
+        "Jump Search",
+        "Medium",
+        "Skip ahead in blocks, then search locally.",
+      ],
+      [
+        "interpolation",
+        "Interpolation Search",
+        "Medium",
+        "Estimate where a value may be in sorted data.",
+      ],
+    ],
+  },
+  {
+    name: "Greedy",
+    path: "/greedy-algorithm/:algorithm",
+    description:
+      "Make locally optimal choices to efficiently reach a global solution.",
+    items: [
+      [
+        "activity-selection",
+        "Activity Selection",
+        "Easy",
+        "Choose the largest compatible set of activities.",
+      ],
+      [
+        "huffman-coding",
+        "Huffman Coding",
+        "Medium",
+        "Build an efficient prefix code from frequencies.",
+      ],
+    ],
+  },
+  {
+    name: "Tree",
+    path: "/tree-algorithms/:algorithm",
+    description:
+      "Understand hierarchical structures, traversal, and balanced search trees.",
+    items: [
+      [
+        "tree-traversals",
+        "Tree Traversals",
+        "Easy",
+        "Explore pre-order, in-order, and post-order traversal.",
+      ],
+      [
+        "binary-search-tree",
+        "Binary Search Tree",
+        "Medium",
+        "Organize searchable values in a binary tree.",
+      ],
+      [
+        "avl-tree",
+        "AVL Tree",
+        "Hard",
+        "Keep a binary search tree height-balanced.",
+      ],
+      [
+        "red-black-tree",
+        "Red-Black Tree",
+        "Hard",
+        "Use color rules to maintain fast operations.",
+      ],
+    ],
+  },
+  {
     name: "Graph",
     path: "/graph/:algorithm",
     description:
@@ -107,38 +191,6 @@ const categories = [
     ],
   },
   {
-    name: "Tree",
-    path: "/tree-algorithms/:algorithm",
-    description:
-      "Understand hierarchical structures, traversal, and balanced search trees.",
-    items: [
-      [
-        "tree-traversals",
-        "Tree Traversals",
-        "Easy",
-        "Explore pre-order, in-order, and post-order traversal.",
-      ],
-      [
-        "binary-search-tree",
-        "Binary Search Tree",
-        "Medium",
-        "Organize searchable values in a binary tree.",
-      ],
-      [
-        "avl-tree",
-        "AVL Tree",
-        "Hard",
-        "Keep a binary search tree height-balanced.",
-      ],
-      [
-        "red-black-tree",
-        "Red-Black Tree",
-        "Hard",
-        "Use color rules to maintain fast operations.",
-      ],
-    ],
-  },
-  {
     name: "Dynamic Programming",
     path: "/dynamic-programming/:algorithm",
     description:
@@ -167,58 +219,6 @@ const categories = [
         "Edit Distance",
         "Hard",
         "Measure edits required to transform one string into another.",
-      ],
-    ],
-  },
-  {
-    name: "Greedy",
-    path: "/greedy-algorithm/:algorithm",
-    description:
-      "Make locally optimal choices to efficiently reach a global solution.",
-    items: [
-      [
-        "activity-selection",
-        "Activity Selection",
-        "Easy",
-        "Choose the largest compatible set of activities.",
-      ],
-      [
-        "huffman-coding",
-        "Huffman Coding",
-        "Medium",
-        "Build an efficient prefix code from frequencies.",
-      ],
-    ],
-  },
-  {
-    name: "Searching",
-    path: "/searching/:algorithm",
-    description:
-      "Find values efficiently across sorted and unsorted collections.",
-    items: [
-      [
-        "linear",
-        "Linear Search",
-        "Easy",
-        "Check each value until a match is found.",
-      ],
-      [
-        "binary",
-        "Binary Search",
-        "Easy",
-        "Halve a sorted search space at every step.",
-      ],
-      [
-        "jump",
-        "Jump Search",
-        "Medium",
-        "Skip ahead in blocks, then search locally.",
-      ],
-      [
-        "interpolation",
-        "Interpolation Search",
-        "Medium",
-        "Estimate where a value may be in sorted data.",
       ],
     ],
   },
