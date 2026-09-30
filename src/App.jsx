@@ -13,8 +13,12 @@ import MathVisualizer from "./components/mathematical/MathVisualizer";
 import ErrorBoundary from "./components/ErrorBoundary";
 import RaceMode from "./components/race/RaceMode";
 import Faq from "./components/FAQ"; // Add this import
+import { useSmoothScroll } from "./hooks/useSmoothScroll";
+
 
 const App = () => {
+  useSmoothScroll();
+
   // Enhanced structured data for SEO
   const structuredData = {
     "@context": "https://schema.org",
