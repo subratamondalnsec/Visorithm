@@ -236,7 +236,7 @@ function AccordionColumn({ category, index, isOpen, onOpen, reduceMotion }) {
 
             {/* overflow-hidden (not auto) - a scrollbar must never be
                 able to appear here, even in a worst case */}
-            <div className="mt-6 flex-1 overflow-hidden">
+            <div className="mt-6 flex flex-1 flex-col gap-1.5 overflow-hidden">
               {category.items.map(([id, title, difficulty]) => (
                 <AlgorithmRow
                   key={id}
@@ -264,36 +264,35 @@ function AlgorithmRow({ to, icon: Icon, title, difficulty }) {
   return (
     <Link
       to={to}
-      className="group/row -mx-3 flex items-center justify-between gap-4 rounded-2xl border-b border-white/10 px-3 py-4 transition-[background-color,transform] duration-300 last:border-b-0 hover:bg-white/[0.05] hover:scale-[1.01]"
+      className="group/row flex items-center justify-between gap-4 rounded-2xl border border-transparent border-b-white/10 px-4 py-3.5 transition-all duration-300 hover:border-blue-500/20 hover:bg-gradient-to-r hover:from-blue-500/10 hover:to-transparent hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.5)] hover:-translate-y-0.5"
       style={{ transitionTimingFunction: SPRING_EASE }}
     >
-      <span className="flex min-w-0 items-center gap-3">
-        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-white/5 text-slate-400 transition-colors duration-300 group-hover/row:bg-blue-400/10 group-hover/row:text-blue-300">
-          <Icon className="h-4 w-4" strokeWidth={2} />
+      <span className="flex min-w-0 items-center gap-4">
+        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-slate-800/50 border border-slate-700/50 text-slate-400 shadow-inner transition-all duration-300 group-hover/row:bg-blue-500/20 group-hover/row:border-blue-500/30 group-hover/row:text-blue-300 group-hover/row:shadow-[0_0_15px_rgba(59,130,246,0.2)]">
+          <Icon className="h-4 w-4" strokeWidth={2.5} />
         </span>
-        <span className="truncate font-medium text-slate-200 transition-colors duration-300 group-hover/row:text-white">
+        <span className="truncate font-semibold text-slate-300 transition-colors duration-300 group-hover/row:text-white">
           {title}
         </span>
         <span
-          className={`shrink-0 rounded-full border px-2 py-0.5 text-[11px] ${difficulty === "Easy"
-              ? "border-blue-400/25 bg-blue-400/10 text-blue-300"
+          className={`shrink-0 rounded-full border px-2.5 py-0.5 text-[10px] font-bold tracking-wide uppercase transition-all duration-300 ${
+            difficulty === "Easy"
+              ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-400 group-hover/row:border-emerald-500/30 group-hover/row:bg-emerald-500/15 group-hover/row:shadow-[0_0_12px_rgba(16,185,129,0.2)]"
               : difficulty === "Medium"
-                ? "border-amber-400/25 bg-amber-400/10 text-amber-300"
-                : "border-rose-400/25 bg-rose-400/10 text-rose-300"
-            }`}
+                ? "border-amber-500/20 bg-amber-500/10 text-amber-400 group-hover/row:border-amber-500/30 group-hover/row:bg-amber-500/15 group-hover/row:shadow-[0_0_12px_rgba(245,158,11,0.2)]"
+                : "border-rose-500/20 bg-rose-500/10 text-rose-400 group-hover/row:border-rose-500/30 group-hover/row:bg-rose-500/15 group-hover/row:shadow-[0_0_12px_rgba(244,63,94,0.2)]"
+          }`}
         >
           {difficulty}
         </span>
       </span>
 
-      {/* arrow chip - deliberately spaced away from the title (not
-          flush against it), and on hover it springs further right
-          and rotates level, overshooting slightly before settling */}
-      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white/5 text-slate-500 transition-colors duration-300 group-hover/row:bg-blue-400/15 group-hover/row:text-blue-300">
+      {/* arrow chip */}
+      <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-slate-800/40 text-slate-500 transition-all duration-300 group-hover/row:bg-blue-500 group-hover/row:text-white group-hover/row:shadow-[0_4px_12px_rgba(59,130,246,0.4)]">
         <ArrowUpRight
-          size={17}
-          strokeWidth={2.4}
-          className="transition-transform duration-500 group-hover/row:translate-x-[3px] group-hover/row:rotate-45"
+          size={16}
+          strokeWidth={2.5}
+          className="transition-transform duration-500 group-hover/row:translate-x-[3px] group-hover/row:rotate-45 group-hover/row:scale-110"
           style={{ transitionTimingFunction: SPRING_EASE }}
         />
       </span>
@@ -338,7 +337,7 @@ function AccordionRow({ category, index, isOpen, onToggle, reduceMotion }) {
             transition={{ duration: reduceMotion ? 0 : 0.3, ease: "easeOut" }}
             className="overflow-hidden"
           >
-            <div className="px-5 pb-4">
+            <div className="flex flex-col gap-1.5 px-5 pb-4">
               <p className="mb-2 text-sm leading-6 text-slate-400">
                 {category.description}
               </p>
