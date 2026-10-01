@@ -81,7 +81,7 @@ export default function ExploreAccordion({ categories, icons, defaultOpen }) {
         .explore-rail {
           --gap: 0.5rem;
           --closed: 4rem;
-          --open-min: 16rem;
+          --open-min: 13rem;
         }
         @media (min-width: 1024px) {
           .explore-rail {
@@ -101,6 +101,11 @@ export default function ExploreAccordion({ categories, icons, defaultOpen }) {
             calc(100% - (var(--count) - 1) * var(--closed) - (var(--count) - 1) * var(--gap))
           );
         }
+        @media (min-width: 680px) and (max-width: 767px) {
+          .explore-rail .algo-icon,
+          .explore-rail .algo-arrow {
+            display: none !important;
+          }
         }
         /* Tablet tier only: hide the category description so the
            trimmed panel stays short. Scoped to the rail, so the
@@ -122,7 +127,7 @@ export default function ExploreAccordion({ categories, icons, defaultOpen }) {
 
       {/* ---------- TABLET + DESKTOP: hover-to-expand column rail ---------- */}
       <div
-        className="explore-rail hidden gap-3 overflow-hidden md:flex md:h-[480px] lg:h-[560px]"
+        className="explore-rail hidden gap-[var(--gap)] overflow-hidden min-[680px]:flex min-[680px]:h-[480px] lg:h-[560px]"
         style={{ "--count": categories.length }}
       >
         {categories.map((category, i) => (
@@ -138,7 +143,7 @@ export default function ExploreAccordion({ categories, icons, defaultOpen }) {
       </div>
 
       {/* ---------- PHONE: vertical tap accordion ---------- */}
-      <div className="divide-y divide-slate-700/60 overflow-hidden rounded-3xl border border-slate-700/60 bg-[#0B1220] md:hidden">
+      <div className="divide-y divide-slate-700/60 overflow-hidden rounded-3xl border border-slate-700/60 bg-[#0B1220] min-[680px]:hidden">
 
         {categories.map((category, i) => (
           <AccordionRow
@@ -222,7 +227,7 @@ function AccordionColumn({ category, index, isOpen, onOpen, reduceMotion }) {
                 <p className="text-3xl sm:text-4xl lg:text-[2.75rem] font-black tracking-tight text-white leading-[1.1]">
                   {category.name}
                 </p>
-                <p className="text-sm font-medium text-slate-400 mt-2">
+                <p className="hidden lg:block text-sm font-medium text-slate-400 mt-2">
                   {category.items.length} algorithms
                 </p>
               </div>
@@ -230,7 +235,7 @@ function AccordionColumn({ category, index, isOpen, onOpen, reduceMotion }) {
 
             {/* description - desktop only; hidden at tablet width via
                 the .explore-note media query above */}
-            <p className="explore-note mt-5 text-sm leading-6 text-slate-300">
+            <p className="explore-note hidden lg:block mt-5 text-sm leading-6 text-slate-300">
               {category.description}
             </p>
 
@@ -268,14 +273,14 @@ function AlgorithmRow({ to, icon: Icon, title, difficulty }) {
       style={{ transitionTimingFunction: SPRING_EASE }}
     >
       <span className="flex min-w-0 items-center gap-4">
-        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-slate-800/50 border border-slate-700/50 text-slate-400 shadow-inner transition-all duration-300 group-hover/row:bg-blue-500/20 group-hover/row:border-blue-500/30 group-hover/row:text-blue-300 group-hover/row:shadow-[0_0_15px_rgba(59,130,246,0.2)]">
+        <span className="algo-icon grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-slate-800/50 border border-slate-700/50 text-slate-400 shadow-inner transition-all duration-300 group-hover/row:bg-blue-500/20 group-hover/row:border-blue-500/30 group-hover/row:text-blue-300 group-hover/row:shadow-[0_0_15px_rgba(59,130,246,0.2)]">
           <Icon className="h-4 w-4" strokeWidth={2.5} />
         </span>
         <span className="truncate font-semibold text-slate-300 transition-colors duration-300 group-hover/row:text-white">
           {title}
         </span>
         <span
-          className={`shrink-0 rounded-full border px-2.5 py-0.5 text-[10px] font-bold tracking-wide uppercase transition-all duration-300 ${
+          className={`hidden min-[900px]:block shrink-0 rounded-full border px-2.5 py-0.5 text-[10px] font-bold tracking-wide uppercase transition-all duration-300 ${
             difficulty === "Easy"
               ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-400 group-hover/row:border-emerald-500/30 group-hover/row:bg-emerald-500/15 group-hover/row:shadow-[0_0_12px_rgba(16,185,129,0.2)]"
               : difficulty === "Medium"
@@ -288,7 +293,7 @@ function AlgorithmRow({ to, icon: Icon, title, difficulty }) {
       </span>
 
       {/* arrow chip */}
-      <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-slate-800/40 text-slate-500 transition-all duration-300 group-hover/row:bg-blue-500 group-hover/row:text-white group-hover/row:shadow-[0_4px_12px_rgba(59,130,246,0.4)]">
+      <span className="algo-arrow grid h-8 w-8 shrink-0 place-items-center rounded-full bg-slate-800/40 text-slate-500 transition-all duration-300 group-hover/row:bg-blue-500 group-hover/row:text-white group-hover/row:shadow-[0_4px_12px_rgba(59,130,246,0.4)]">
         <ArrowUpRight
           size={16}
           strokeWidth={2.5}
