@@ -139,7 +139,7 @@ export default function ExploreAccordion({ categories, icons, defaultOpen }) {
 
       {/* ---------- PHONE: vertical tap accordion ---------- */}
       <div className="divide-y divide-slate-700/60 overflow-hidden rounded-3xl border border-slate-700/60 bg-[#0B1220] md:hidden">
-        
+
         {categories.map((category, i) => (
           <AccordionRow
             key={category.name}
@@ -166,11 +166,10 @@ function AccordionColumn({ category, index, isOpen, onOpen, reduceMotion }) {
       tabIndex={0}
       role="button"
       aria-expanded={isOpen}
-      className={`explore-col relative flex h-full min-w-0 flex-none flex-col overflow-hidden rounded-3xl border outline-none ${
-        isOpen
+      className={`explore-col relative flex h-full min-w-0 flex-none flex-col overflow-hidden rounded-3xl border outline-none ${isOpen
           ? "is-open border-blue-400/50 bg-gradient-to-b from-[#1B3358] to-[#16294A] ring-1 ring-inset ring-blue-400/40"
           : "cursor-pointer border-slate-700/60 bg-[#0F1B2E] hover:bg-[#132238]"
-      }`}
+        }`}
     >
       {/* collapsed label - anchored to the bottom with absolute positioning to prevent layout shifts during flex-basis animation. */}
       <AnimatePresence>
@@ -200,12 +199,18 @@ function AccordionColumn({ category, index, isOpen, onOpen, reduceMotion }) {
         {isOpen && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            transition={{
-              duration: reduceMotion ? 0 : 0.3,
-              ease: "easeOut",
-              delay: reduceMotion ? 0 : 0.15,
+            animate={{
+              opacity: 1,
+              y: 0,
+              transition: {
+                duration: reduceMotion ? 0 : 0.3,
+                ease: "easeOut",
+                delay: reduceMotion ? 0 : 0.15,
+              },
+            }}
+            exit={{
+              opacity: 0,
+              transition: { duration: 0 },
             }}
             className="explore-panel flex h-full w-full flex-col px-5 pt-8 sm:px-8"
           >
@@ -270,13 +275,12 @@ function AlgorithmRow({ to, icon: Icon, title, difficulty }) {
           {title}
         </span>
         <span
-          className={`shrink-0 rounded-full border px-2 py-0.5 text-[11px] ${
-            difficulty === "Easy"
+          className={`shrink-0 rounded-full border px-2 py-0.5 text-[11px] ${difficulty === "Easy"
               ? "border-blue-400/25 bg-blue-400/10 text-blue-300"
               : difficulty === "Medium"
-              ? "border-amber-400/25 bg-amber-400/10 text-amber-300"
-              : "border-rose-400/25 bg-rose-400/10 text-rose-300"
-          }`}
+                ? "border-amber-400/25 bg-amber-400/10 text-amber-300"
+                : "border-rose-400/25 bg-rose-400/10 text-rose-300"
+            }`}
         >
           {difficulty}
         </span>
@@ -319,9 +323,8 @@ function AccordionRow({ category, index, isOpen, onToggle, reduceMotion }) {
         </span>
         <ChevronDown
           size={20}
-          className={`text-slate-400 transition-transform duration-300 ${
-            isOpen ? "rotate-180" : ""
-          }`}
+          className={`text-slate-400 transition-transform duration-300 ${isOpen ? "rotate-180" : ""
+            }`}
         />
       </button>
 
