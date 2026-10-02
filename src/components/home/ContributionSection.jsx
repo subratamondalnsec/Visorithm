@@ -32,12 +32,10 @@ export default function ContributionSection() {
   // Connector 1 (01 -> 02) refs
   const path1Ref = useRef(null);
   const arrow1Ref = useRef(null);
-  const track1Ref = useRef(null);
 
   // Connector 2 (02 -> 03) refs
   const path2Ref = useRef(null);
   const arrow2Ref = useRef(null);
-  const track2Ref = useRef(null);
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
@@ -49,10 +47,8 @@ export default function ContributionSection() {
     const rays = raysRef.current;
     const path1 = path1Ref.current;
     const arrow1 = arrow1Ref.current;
-    const track1 = track1Ref.current;
     const path2 = path2Ref.current;
     const arrow2 = arrow2Ref.current;
-    const track2 = track2Ref.current;
 
     if (!stage1 || !stage2 || !stage3 || !path1 || !arrow1 || !path2 || !arrow2) {
       return undefined;
@@ -92,9 +88,7 @@ export default function ContributionSection() {
             : MOBILE_CONNECTOR_PATH;
 
           path1.setAttribute("d", currentPath);
-          track1.setAttribute("d", currentPath);
           path2.setAttribute("d", currentPath);
-          track2.setAttribute("d", currentPath);
 
           const rawPath = MotionPathPlugin.stringToRawPath(currentPath);
           const startPos = MotionPathPlugin.getPositionOnPath(rawPath, 0, true);
@@ -106,7 +100,6 @@ export default function ContributionSection() {
             if (rays) gsap.set(rays, { opacity: 1 });
             gsap.set([path1, path2], { strokeDashoffset: 0 });
             gsap.set([arrow1, arrow2], { opacity: 1 });
-            gsap.set([track1, track2], { opacity: 0.35 });
             arrow1.setAttribute(
               "transform",
               `translate(${endPos.x}, ${endPos.y}) rotate(${endPos.angle})`
@@ -118,15 +111,13 @@ export default function ContributionSection() {
             return undefined;
           }
 
-          // Deterministic initial state before ScrollTrigger binds
+          // Deterministic initial state before ScrollTrigger binds: paths completely hidden (strokeDashoffset: 100)
           gsap.set(stage1, { opacity: 1, y: 0 });
           gsap.set(stage2, { opacity: 0, y: 22, pointerEvents: "none" });
           gsap.set(stage3, { opacity: 0, y: 22, pointerEvents: "none" });
           if (rays) gsap.set(rays, { opacity: 0 });
 
           gsap.set([path1, path2], { strokeDashoffset: 100 });
-          gsap.set(track1, { opacity: 0.35 });
-          gsap.set(track2, { opacity: 0 });
           gsap.set([arrow1, arrow2], { opacity: 0 });
           arrow1.setAttribute(
             "transform",
@@ -194,10 +185,7 @@ export default function ContributionSection() {
             1.15
           );
 
-          // 4. Reveal Connector 2 guide track as Stage 02 settles
-          tl.to(track2, { opacity: 0.35, duration: 0.15 }, 1.55);
-
-          // 5. SCROLL PHASE 2 (02 -> 03): Connector 2 draws progressively along curve
+          // 4. SCROLL PHASE 2 (02 -> 03): Connector 2 draws progressively along curve
           tl.to(
             progress2,
             {
@@ -418,20 +406,7 @@ export default function ContributionSection() {
                   xmlns="http://www.w3.org/2000/svg"
                   className="w-32 sm:w-36 lg:w-40 h-24 sm:h-28 lg:h-32 overflow-visible"
                 >
-                  {/* Faint dashed trajectory guide - always visible on fresh load */}
-                  <path
-                    ref={track1Ref}
-                    d={DESKTOP_CONNECTOR_PATH}
-                    stroke="rgba(56, 189, 248, 0.25)"
-                    strokeWidth="1.75"
-                    strokeDasharray="4 4"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    fill="none"
-                    style={{ opacity: 0.35 }}
-                  />
-
-                  {/* Active glowing path - direct strokeDashoffset animation for 100% deterministic rendering */}
+                  {/* Single active glowing path - progressively revealed with scroll */}
                   <path
                     ref={path1Ref}
                     d={DESKTOP_CONNECTOR_PATH}
@@ -511,20 +486,7 @@ export default function ContributionSection() {
                   xmlns="http://www.w3.org/2000/svg"
                   className="w-32 sm:w-36 lg:w-40 h-24 sm:h-28 lg:h-32 overflow-visible"
                 >
-                  {/* Faint dashed trajectory guide */}
-                  <path
-                    ref={track2Ref}
-                    d={DESKTOP_CONNECTOR_PATH}
-                    stroke="rgba(56, 189, 248, 0.25)"
-                    strokeWidth="1.75"
-                    strokeDasharray="4 4"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    fill="none"
-                    style={{ opacity: 0 }}
-                  />
-
-                  {/* Active glowing path */}
+                  {/* Single active glowing path - progressively revealed with scroll */}
                   <path
                     ref={path2Ref}
                     d={DESKTOP_CONNECTOR_PATH}
