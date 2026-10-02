@@ -8,6 +8,7 @@ import TextHoverEffect from "./home/TextHoverEffect";
 import TrustedByDSASection from "./home/TrustedByDSASection";
 import ScrollImageStack from "./home/ScrollImageStack";
 import ExploreAccordion from "./home/ExploreAccordion";
+import ContributionSection from "./home/ContributionSection";
 import Aboutme from "./home/AboutMe"
 import ProjectCTASection from "./home/ProjectCTASection"
 import Footer from "./home/Footer";
@@ -407,6 +408,8 @@ const HomeRedesign = () => {
           />
         </div>
       </main>
+
+      <ContributionSection />
 
       <Aboutme />
        <ProjectCTASection/> 
