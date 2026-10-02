@@ -23,6 +23,10 @@ import {
   Divide,
   FastForward,
   LineChart,
+  Crown,
+  LayoutGrid,
+  Calculator,
+  Hash,
 } from "lucide-react";
 
 /**
@@ -71,4 +75,14 @@ export const ALGORITHM_ICONS = {
   binary: Divide, // halves the search space each step
   jump: FastForward, // skips ahead in blocks
   interpolation: LineChart, // estimates position from a trend
+
+  // Backtracking
+  "n-queens": Crown, // non-attacking chess queens
+  "sudoku-solver": LayoutGrid, // 9x9 sudoku grid
+
+  // Mathematical
+  "gcd-euclidean": Calculator, // greatest common divisor
+  "gcd-(euclidean)": Calculator,
+  "sieve-of-eratosthenes": Hash, // prime number sieve
+  "prime-factorization": Binary, // prime factors decomposition
 };

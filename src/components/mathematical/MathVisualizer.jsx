@@ -16,6 +16,7 @@ const MathVisualizer = () => {
   });
   const [isAnimating, setIsAnimating] = useState(false);
   const [speed, setSpeed] = useState(1);
+  const isGcd = algorithm === 'gcd-(euclidean)' || algorithm === 'gcd-euclidean';
   
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -30,7 +31,7 @@ const MathVisualizer = () => {
   };
   
   const startVisualization = () => {
-    if ((algorithm === 'gcd-(euclidean)' && inputValues.num1 > 0 && inputValues.num2 > 0) || 
+    if ((isGcd && inputValues.num1 > 0 && inputValues.num2 > 0) || 
         (algorithm === 'sieve-of-eratosthenes' && inputValues.maxNumber > 1) ||
         (algorithm === 'prime-factorization' && inputValues.factorNumber > 1)) {
       setIsAnimating(true);
@@ -44,6 +45,7 @@ const MathVisualizer = () => {
   const renderVisualizer = () => {
     switch (algorithm) {
       case 'gcd-(euclidean)':
+      case 'gcd-euclidean':
         return (
           <EuclideanGCDVisualizer 
             num1={inputValues.num1} 
@@ -79,6 +81,7 @@ const MathVisualizer = () => {
   const getAlgorithmTitle = () => {
     switch (algorithm) {
       case 'gcd-(euclidean)':
+      case 'gcd-euclidean':
         return 'Euclidean Algorithm (GCD)';
       case 'sieve-of-eratosthenes':
         return 'Sieve of Eratosthenes';
@@ -101,7 +104,7 @@ const MathVisualizer = () => {
         <div className="p-4 bg-slate-800 rounded-lg">
           <h3 className="text-lg text-white font-medium mb-4">Parameters</h3>
           <div className="space-y-4">
-            {algorithm === 'gcd-(euclidean)' && (
+            {(algorithm === 'gcd-(euclidean)' || algorithm === 'gcd-euclidean') && (
               <>
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-1">First Number</label>
@@ -200,7 +203,13 @@ const MathVisualizer = () => {
         <div className="p-4 bg-slate-800 rounded-lg">
           <h3 className="text-lg text-white font-medium mb-4">About the Algorithm</h3>
           <div className="text-sm text-gray-300">
-            {algorithm === 'gcd-(euclidean)' ? (
+            {(algorithm === 'gcd-(euclidean)' || algorithm === 'gcd-euclidean') ? (
+              <>
+                <p>The Euclidean algorithm is an efficient method for computing the greatest common divisor (GCD) of two integers.</p>
+                <p className="mt-2">It works by repeatedly applying the division algorithm and taking remainders until reaching zero.</p>
+                <p className="mt-2">Formula: gcd(a,b) = gcd(b, a mod b)</p>
+              </>
+            ) : algorithm === 'sieve-of-eratosthenes' ? (
               <>
                 <p>The Euclidean algorithm is an efficient method for computing the greatest common divisor (GCD) of two integers.</p>
                 <p className="mt-2">It works by repeatedly applying the division algorithm and taking remainders until reaching zero.</p>

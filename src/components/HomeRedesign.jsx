@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { motion, useReducedMotion } from "motion/react";
-import { ArrowUpRight, ArrowUpDown, Share2, TreePine, Grid3x3, Gem, Search } from "lucide-react";
+import { ArrowUpRight, ArrowUpDown, Share2, TreePine, Grid3x3, Gem, Search, Undo2, Calculator } from "lucide-react";
 import { AnimatedBars } from "./ui/animated-bars";
 import { TextFrame } from "./ui/text-frame";
 import TextHoverEffect from "./home/TextHoverEffect";
@@ -28,6 +28,9 @@ const icons = {
   "Dynamic Programming": Grid3x3,
   Greedy: Gem,
   Searching: Search,
+  Backtracking: Undo2,
+  Mathematical: Calculator,
+  Math: Calculator,
 };
 
 const categories = [
@@ -220,6 +223,52 @@ const categories = [
         "Edit Distance",
         "Hard",
         "Measure edits required to transform one string into another.",
+      ],
+    ],
+  },
+  {
+    name: "Backtracking",
+    path: "/backtracking/:algorithm",
+    description:
+      "Build solutions incrementally and abandon choices that violate constraints.",
+    items: [
+      [
+        "n-queens",
+        "N-Queens",
+        "Hard",
+        "Place N non-attacking queens on an N×N board.",
+      ],
+      [
+        "sudoku-solver",
+        "Sudoku Solver",
+        "Hard",
+        "Fill a 9×9 grid so every row, column, and block contains 1–9.",
+      ],
+    ],
+  },
+  {
+    name: "Mathematical",
+    path: "/mathematical-algorithms/:algorithm",
+    description:
+      "Compute number theory properties, prime distributions, and greatest common divisors.",
+    items: [
+      [
+        "gcd-euclidean",
+        "GCD (Euclidean)",
+        "Easy",
+        "Computes the greatest common divisor via remainders.",
+      ],
+      [
+        "sieve-of-eratosthenes",
+        "Sieve of Eratosthenes",
+        "Medium",
+        "Identifies all prime numbers up to a given limit.",
+      ],
+      [
+        "prime-factorization",
+        "Prime Factorization",
+        "Medium",
+        "Decomposes composite numbers into prime factors.",
       ],
     ],
   },
