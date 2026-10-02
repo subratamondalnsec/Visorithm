@@ -79,15 +79,29 @@ export default function ExploreAccordion({ categories, icons, defaultOpen }) {
     <div className="w-full">
       <style>{`
         .explore-rail {
-          --gap: 0.5rem;
-          --closed: 4rem;
-          --open-min: 13rem;
+          --gap: 0.375rem;
+          --closed: 3.125rem;
+          --open-min: 12.5rem;
+        }
+        @media (min-width: 768px) {
+          .explore-rail {
+            --gap: 0.5rem;
+            --closed: 3.5rem;
+            --open-min: 14rem;
+          }
         }
         @media (min-width: 1024px) {
           .explore-rail {
-            --gap: 0.75rem;
-            --closed: 6.875rem;
-            --open-min: 18.75rem;
+            --gap: 0.5rem;
+            --closed: 4.5rem;
+            --open-min: 18rem;
+          }
+        }
+        @media (min-width: 1280px) {
+          .explore-rail {
+            --gap: 0.625rem;
+            --closed: 5.25rem;
+            --open-min: 20rem;
           }
         }
         .explore-rail > .explore-col {
@@ -127,7 +141,7 @@ export default function ExploreAccordion({ categories, icons, defaultOpen }) {
 
       {/* ---------- TABLET + DESKTOP: hover-to-expand column rail ---------- */}
       <div
-        className="explore-rail hidden gap-[var(--gap)] overflow-hidden min-[680px]:flex min-[680px]:h-[480px] lg:h-[560px]"
+        className="explore-rail hidden gap-[var(--gap)] overflow-hidden min-[680px]:flex min-[680px]:h-[500px] lg:h-[580px]"
         style={{ "--count": categories.length }}
       >
         {categories.map((category, i) => (
@@ -184,13 +198,13 @@ function AccordionColumn({ category, index, isOpen, onOpen, reduceMotion }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: reduceMotion ? 0 : 0.2 }}
-            className="absolute inset-0 flex flex-col items-center justify-end pb-22 px-2"
+            className="absolute inset-0 flex flex-col items-center justify-end pb-8 sm:pb-12 lg:pb-16 px-1 sm:px-2"
           >
-            <div className="explore-vlabel flex items-center gap-22">
-              <span className="font-mono text-lg lg:text-2xl font-bold text-slate-500 slashed-zero">
+            <div className="explore-vlabel flex items-center gap-6 sm:gap-10 lg:gap-14">
+              <span className="font-mono text-sm sm:text-base lg:text-xl font-bold text-slate-500 slashed-zero">
                 {String(index + 1).padStart(2, "0")}
               </span>
-              <span className="text-2xl lg:text-[1.75rem] font-black tracking-tight text-slate-100">
+              <span className="text-base sm:text-lg lg:text-xl xl:text-2xl font-black tracking-tight text-slate-100">
                 {category.name}
               </span>
             </div>
@@ -217,17 +231,17 @@ function AccordionColumn({ category, index, isOpen, onOpen, reduceMotion }) {
               opacity: 0,
               transition: { duration: 0 },
             }}
-            className="explore-panel flex h-full w-full flex-col px-5 pt-8 sm:px-8"
+            className="explore-panel flex h-full w-full flex-col px-4 pt-6 sm:px-6 sm:pt-8 lg:px-8"
           >
             <div className="flex items-start gap-3 lg:gap-4">
-              <span className="mt-2.5 font-mono text-xs font-bold text-slate-400/80 slashed-zero lg:mt-3.5 lg:text-sm">
+              <span className="mt-2 font-mono text-xs font-bold text-slate-400/80 slashed-zero lg:mt-3 lg:text-sm">
                 {String(index + 1).padStart(2, "0")}
               </span>
               <div>
-                <p className="text-3xl sm:text-4xl lg:text-[2.75rem] font-black tracking-tight text-white leading-[1.1]">
+                <p className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-white leading-[1.1]">
                   {category.name}
                 </p>
-                <p className="hidden lg:block text-sm font-medium text-slate-400 mt-2">
+                <p className="hidden lg:block text-xs sm:text-sm font-medium text-slate-400 mt-1.5">
                   {category.items.length} algorithms
                 </p>
               </div>
@@ -235,13 +249,13 @@ function AccordionColumn({ category, index, isOpen, onOpen, reduceMotion }) {
 
             {/* description - desktop only; hidden at tablet width via
                 the .explore-note media query above */}
-            <p className="explore-note hidden lg:block mt-5 text-sm leading-6 text-slate-300">
+            <p className="explore-note hidden lg:block mt-3 text-xs sm:text-sm leading-relaxed text-slate-300 line-clamp-2">
               {category.description}
             </p>
 
             {/* overflow-hidden (not auto) - a scrollbar must never be
                 able to appear here, even in a worst case */}
-            <div className="mt-6 flex flex-1 flex-col gap-1.5 overflow-hidden">
+            <div className="mt-4 sm:mt-5 flex flex-1 flex-col gap-1.5 overflow-hidden">
               {category.items.map(([id, title, difficulty]) => (
                 <AlgorithmRow
                   key={id}
@@ -266,17 +280,18 @@ function AccordionColumn({ category, index, isOpen, onOpen, reduceMotion }) {
 /*  via a back-out easing curve instead of a small linear nudge.      */
 /* ------------------------------------------------------------------ */
 function AlgorithmRow({ to, icon: Icon, title, difficulty }) {
+  const IconComponent = Icon || ArrowUpRight;
   return (
     <Link
       to={to}
-      className="group/row flex items-center justify-between gap-4 rounded-2xl border border-transparent border-b-white/10 px-4 py-3.5 transition-all duration-300 hover:border-blue-500/20 hover:bg-gradient-to-r hover:from-blue-500/10 hover:to-transparent hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.5)] hover:-translate-y-0.5"
+      className="group/row flex items-center justify-between gap-3 sm:gap-4 rounded-2xl border border-transparent border-b-white/10 px-3 sm:px-4 py-2.5 sm:py-3 transition-all duration-300 hover:border-blue-500/20 hover:bg-gradient-to-r hover:from-blue-500/10 hover:to-transparent hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.5)] hover:-translate-y-0.5"
       style={{ transitionTimingFunction: SPRING_EASE }}
     >
-      <span className="flex min-w-0 items-center gap-4">
-        <span className="algo-icon grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-slate-800/50 border border-slate-700/50 text-slate-400 shadow-inner transition-all duration-300 group-hover/row:bg-blue-500/20 group-hover/row:border-blue-500/30 group-hover/row:text-blue-300 group-hover/row:shadow-[0_0_15px_rgba(59,130,246,0.2)]">
-          <Icon className="h-4 w-4" strokeWidth={2.5} />
+      <span className="flex min-w-0 items-center gap-2.5 sm:gap-4">
+        <span className="algo-icon grid h-8 w-8 sm:h-9 sm:w-9 shrink-0 place-items-center rounded-xl bg-slate-800/50 border border-slate-700/50 text-slate-400 shadow-inner transition-all duration-300 group-hover/row:bg-blue-500/20 group-hover/row:border-blue-500/30 group-hover/row:text-blue-300 group-hover/row:shadow-[0_0_15px_rgba(59,130,246,0.2)]">
+          <IconComponent className="h-4 w-4" strokeWidth={2.5} />
         </span>
-        <span className="truncate font-semibold text-slate-300 transition-colors duration-300 group-hover/row:text-white">
+        <span className="truncate font-semibold text-xs sm:text-sm lg:text-base text-slate-300 transition-colors duration-300 group-hover/row:text-white">
           {title}
         </span>
         <span
@@ -293,9 +308,9 @@ function AlgorithmRow({ to, icon: Icon, title, difficulty }) {
       </span>
 
       {/* arrow chip */}
-      <span className="algo-arrow grid h-8 w-8 shrink-0 place-items-center rounded-full bg-slate-800/40 text-slate-500 transition-all duration-300 group-hover/row:bg-blue-500 group-hover/row:text-white group-hover/row:shadow-[0_4px_12px_rgba(59,130,246,0.4)]">
+      <span className="algo-arrow grid h-7 w-7 sm:h-8 sm:w-8 shrink-0 place-items-center rounded-full bg-slate-800/40 text-slate-500 transition-all duration-300 group-hover/row:bg-blue-500 group-hover/row:text-white group-hover/row:shadow-[0_4px_12px_rgba(59,130,246,0.4)]">
         <ArrowUpRight
-          size={16}
+          size={15}
           strokeWidth={2.5}
           className="transition-transform duration-500 group-hover/row:translate-x-[3px] group-hover/row:rotate-45 group-hover/row:scale-110"
           style={{ transitionTimingFunction: SPRING_EASE }}
